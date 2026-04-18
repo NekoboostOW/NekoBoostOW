@@ -2,506 +2,662 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Overwatch Rank Boost</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
 
     :root {
       --orange: #ff9800;
-      --bg: #0e0e0e;
-      --surface: #1a1a1a;
-      --border: #2a2a2a;
-      --text: #e0e0e0;
-      --muted: #777;
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1c1c1c;
+      --border: #262626;
+      --text: #e8e8e8;
+      --muted: #666;
       --green: #4caf50;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
+    html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+    body { display: flex; align-items: flex-start; justify-content: center; padding: 16px; min-height: 100%; }
+    @media (min-width: 520px) { body { align-items: center; padding: 24px; } }
 
     .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 32px;
-      width: 100%;
-      max-width: 480px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px 20px; width: 100%; max-width: 460px;
     }
+    @media (min-width: 520px) { .card { padding: 32px 28px; } }
 
-    h1 {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--orange);
-      letter-spacing: 1px;
-      margin-bottom: 24px;
+    h1 { font-family: 'Rajdhani', sans-serif; font-size: 26px; font-weight: 700; color: var(--orange); letter-spacing: 1px; margin-bottom: 22px; }
+
+    /* Fields */
+    .field { margin-bottom: 8px; position: relative; }
+    .field-label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.9px; margin-bottom: 5px; }
+
+    /* Custom select */
+    .custom-select { position: relative; user-select: none; }
+    .cs-trigger {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+      cursor: pointer; transition: border-color 0.15s; font-size: 14px; font-family: inherit;
     }
-
-    .field { margin-bottom: 16px; }
-
-    label {
-      display: block;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 6px;
+    .cs-trigger:hover, .custom-select.open .cs-trigger { border-color: var(--orange); }
+    .cs-label { flex: 1; }
+    .cs-arrow { margin-left: auto; transition: transform 0.2s; color: var(--muted); flex-shrink: 0; }
+    .custom-select.open .cs-arrow { transform: rotate(180deg); }
+    .cs-dropdown {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+      z-index: 100; max-height: 240px; overflow-y: auto;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
     }
+    .custom-select.open .cs-dropdown { display: block; }
+    .cs-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; cursor: pointer; font-size: 13px; transition: background 0.1s; }
+    .cs-option:hover { background: rgba(255,152,0,0.07); }
+    .cs-option.selected { color: var(--orange); }
+    .cs-group-header { padding: 6px 12px 3px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); border-top: 1px solid var(--border); }
+    .cs-group-header:first-child { border-top: none; }
+    .rank-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
 
-    select {
-      width: 100%;
-      padding: 10px 12px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 14px;
-      cursor: pointer;
-      transition: border-color 0.15s;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23777' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
+    /* Pct slider (inline under each dropdown) */
+    .pct-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 2px 14px;
     }
-    select:focus { outline: none; border-color: var(--orange); }
-
-    .checkboxes {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
+    .pct-track {
+      flex: 1; position: relative; height: 5px;
+      border-radius: 99px; cursor: pointer; overflow: visible;
     }
-    .checkboxes:last-of-type { margin-bottom: 20px; }
+    .pct-fill {
+      position: absolute; top: 0; left: 0; height: 100%;
+      border-radius: 99px; pointer-events: none;
+    }
+    .pct-thumb {
+      position: absolute; top: 50%;
+      transform: translate(-50%, -50%);
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid var(--surface);
+      cursor: grab; z-index: 2; touch-action: none;
+    }
+    .pct-thumb.dragging { cursor: grabbing; }
+    .pct-label { font-size: 10px; font-weight: 600; color: var(--muted); white-space: nowrap; min-width: 28px; text-align: right; }
 
+    /* Checkboxes */
+    .checkboxes { display: flex; gap: 10px; margin-bottom: 10px; }
+    .checkboxes:last-of-type { margin-bottom: 18px; }
     .check-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 14px;
-      cursor: pointer;
-      flex: 1;
-      font-size: 13px;
-      transition: border-color 0.15s, background 0.15s;
-      user-select: none;
-    }
-    .check-label:has(input:checked) {
-      border-color: var(--orange);
-      background: rgba(255,152,0,0.06);
-      color: var(--orange);
-    }
-    .check-label.free:has(input:checked) {
-      border-color: var(--green);
-      background: rgba(76,175,80,0.06);
-      color: var(--green);
+      display: flex; align-items: center; gap: 8px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px;
+      cursor: pointer; flex: 1; font-size: 12px;
+      transition: border-color 0.15s, background 0.15s; user-select: none; line-height: 1.3;
     }
     .check-label input { display: none; }
+    .check-box { width: 14px; height: 14px; border: 1.5px solid var(--border); border-radius: 3px; flex-shrink: 0; transition: background 0.15s, border-color 0.15s; display: flex; align-items: center; justify-content: center; }
+    .check-label input:checked ~ .check-box { background: var(--orange); border-color: var(--orange); }
+    .check-label input:checked ~ .check-box::after { content: ''; width: 5px; height: 3px; border-left: 1.5px solid #000; border-bottom: 1.5px solid #000; transform: rotate(-45deg) translateY(-1px); display: block; }
+    .check-label:has(input:checked) { border-color: var(--orange); background: rgba(255,152,0,0.05); }
+    .check-label.free:has(input:checked) { border-color: var(--green); background: rgba(76,175,80,0.05); }
+    .check-label.free input:checked ~ .check-box { background: var(--green); border-color: var(--green); }
+    .check-tag { margin-left: auto; font-size: 10px; font-weight: 600; color: var(--muted); }
+    .check-label:has(input:checked) .check-tag { color: inherit; }
 
-    /* Progress bar */
-    .progress-wrap { margin-bottom: 20px; }
-
+    /* Main progress bar */
+    .progress-wrap { margin-bottom: 4px; }
     .progress-track {
-      position: relative;
-      height: 8px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 99px;
-      margin-bottom: 8px;
-      cursor: pointer;
+      position: relative; height: 8px; border-radius: 99px;
+      margin-bottom: 6px; cursor: pointer; overflow: hidden;
     }
+    /* Static rainbow bg — always visible */
+    .progress-bg {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 99px; pointer-events: none;
+      background: linear-gradient(90deg,
+        #a0522d 0%,
+        #b0b8c8 16.6%,
+        #f0b429 33.2%,
+        #3ecfcf 50%,
+        #4a9eff 66.6%,
+        #3ddc84 83.2%,
+        #f5a623 100%
+      );
+      opacity: 0.25;
+    }
+    /* Active fill overlay — same gradient but full opacity, clipped to selection */
     .progress-fill {
-      position: absolute;
-      top: 0; left: 0; height: 100%;
-      border-radius: 99px;
-      pointer-events: none;
+      position: absolute; top: 0; height: 100%;
+      border-radius: 99px; pointer-events: none;
+      background: linear-gradient(90deg,
+        #a0522d 0%,
+        #b0b8c8 16.6%,
+        #f0b429 33.2%,
+        #3ecfcf 50%,
+        #4a9eff 66.6%,
+        #3ddc84 83.2%,
+        #f5a623 100%
+      );
+      background-size: 460px 100%;
+    }
+    .progress-tick {
+      position: absolute; top: 0; width: 1px; height: 100%;
+      background: rgba(0,0,0,0.5); pointer-events: none; z-index: 1;
     }
     .progress-dot {
-      position: absolute;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      border: 2px solid var(--surface);
-      cursor: grab;
-      z-index: 2;
-      transition: transform 0.1s, box-shadow 0.1s;
-      touch-action: none;
+      position: absolute; top: 50%; transform: translate(-50%, -50%);
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2.5px solid var(--surface);
+      cursor: grab; z-index: 3; touch-action: none;
     }
-    .progress-dot:hover {
-      transform: translate(-50%, -50%) scale(1.25);
-      box-shadow: 0 0 0 4px rgba(255,152,0,0.2);
-    }
-    .progress-dot.dragging {
-      cursor: grabbing;
-      transform: translate(-50%, -50%) scale(1.35);
-      box-shadow: 0 0 0 6px rgba(255,152,0,0.25);
-      transition: none;
-    }
-    .progress-dot.from { background: #aaa; }
-    .progress-dot.to   { background: var(--orange); }
-
-    .progress-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 9px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 0 2px;
-    }
-
-    /* Tooltip */
+    .progress-dot.dragging { cursor: grabbing; }
     .dot-tooltip {
-      position: absolute;
-      bottom: 22px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #333;
-      color: #fff;
-      font-size: 10px;
-      white-space: nowrap;
-      padding: 3px 6px;
-      border-radius: 4px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
+      position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+      background: #222; border: 1px solid var(--border); color: #fff;
+      font-size: 10px; white-space: nowrap; padding: 3px 7px; border-radius: 5px;
+      pointer-events: none; opacity: 0; transition: opacity 0.15s;
     }
-    .progress-dot:hover .dot-tooltip,
-    .progress-dot.dragging .dot-tooltip { opacity: 1; }
+    .progress-dot:hover .dot-tooltip, .progress-dot.dragging .dot-tooltip { opacity: 1; }
 
-    /* Price box */
+    /* Tier labels — centered under each tier segment */
+    .progress-labels { position: relative; height: 16px; margin-bottom: 16px; }
+    .progress-labels span {
+      position: absolute; transform: translateX(-50%);
+      font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; opacity: 0.8;
+    }
+
+    /* Price box — fixed layout so it never jumps */
     .price-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 16px 12px;
-      text-align: center;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 12px;
     }
-    .price-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-    .price-original {
-      font-size: 14px;
-      color: var(--muted);
-      text-decoration: line-through;
-      min-height: 20px;
-      margin-bottom: 2px;
-    }
-    .price-value {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--orange);
-    }
-    .price-value.error { font-size: 16px; color: #e57373; }
+    .price-meta { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 2px; }
+    .price-original { font-size: 13px; color: var(--muted); text-decoration: line-through; height: 16px; line-height: 16px; }
+    .price-value { font-family: 'Rajdhani', sans-serif; font-size: 40px; font-weight: 700; color: var(--orange); line-height: 1.1; }
+    .price-value.error { font-size: 15px; color: #e57373; }
+    /* Badge: always takes space, invisible when empty */
     .price-badge {
-      display: inline-block;
-      margin-top: 6px;
-      background: rgba(76,175,80,0.15);
-      color: var(--green);
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-size: 12px;
-      font-weight: 500;
-      min-height: 20px;
+      display: block; height: 22px; line-height: 22px;
+      margin-top: 6px; border-radius: 5px; font-size: 12px; font-weight: 600;
+      background: transparent; color: transparent;
+      transition: background 0.2s, color 0.2s;
     }
+    .price-badge.active { background: rgba(76,175,80,0.12); color: var(--green); }
+
+    /* Copy button */
+    .copy-btn {
+      width: 100%; padding: 12px;
+      background: rgba(255,152,0,0.1); border: 1px solid rgba(255,152,0,0.3);
+      border-radius: 8px; color: var(--orange); font-family: inherit;
+      font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.5px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .copy-btn:hover { background: rgba(255,152,0,0.18); border-color: var(--orange); }
+    .copy-btn.copied { background: rgba(76,175,80,0.12); border-color: var(--green); color: var(--green); }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Rank Boost</h1>
+<div class="card">
+  <h1>Rank Boost</h1>
 
-    <div class="field">
-      <label>Current Rank</label>
-      <select id="currentRank"></select>
-    </div>
-
-    <div class="field">
-      <label>Desired Rank</label>
-      <select id="desiredRank"></select>
-    </div>
-
-    <div class="field">
-      <label>Role</label>
-      <select id="role"></select>
-    </div>
-
-    <div class="checkboxes">
-      <label class="check-label">
-        <input type="checkbox" id="duoBoost"> Duo Boost <span style="color:var(--muted);font-size:11px">+70%</span>
-      </label>
-      <label class="check-label">
-        <input type="checkbox" id="stream"> Stream <span style="color:var(--muted);font-size:11px">+5%</span>
-      </label>
-    </div>
-    <div class="checkboxes">
-      <label class="check-label free">
-        <input type="checkbox" id="offline"> Offline Mode <span style="color:#4caf50;font-size:11px">Free</span>
-      </label>
-      <label class="check-label free">
-        <input type="checkbox" id="vpn"> VPN <span style="color:#4caf50;font-size:11px">Free</span>
-      </label>
-    </div>
-
-    <div class="progress-wrap">
-      <div class="progress-track" id="progressTrack">
-        <div class="progress-fill" id="progressFill"></div>
-        <div class="progress-dot from" id="dotFrom">
-          <div class="dot-tooltip" id="tipFrom"></div>
-        </div>
-        <div class="progress-dot to" id="dotTo">
-          <div class="dot-tooltip" id="tipTo"></div>
-        </div>
+  <div class="field">
+    <span class="field-label">Current Rank</span>
+    <div class="custom-select" id="csFrom"></div>
+    <div class="pct-row">
+      <div class="pct-track" id="pctFromTrack">
+        <div class="pct-fill" id="pctFromFill"></div>
+        <div class="pct-thumb" id="pctFromThumb"></div>
       </div>
-      <div class="progress-labels" id="progressLabels"></div>
-    </div>
-
-    <div class="price-box">
-      <div class="price-label">Total Price</div>
-      <div class="price-original" id="priceOriginal"></div>
-      <div class="price-value" id="priceOutput">—</div>
-      <div class="price-badge" id="priceBadge"></div>
+      <span class="pct-label" id="pctFromVal">0%</span>
     </div>
   </div>
 
-  <script>
-    const TIERS = ["bronze","silver","gold","platinum","diamond","master","grandmaster"];
-    const DIVS  = [5,4,3,2,1];
+  <div class="field">
+    <span class="field-label">Desired Rank</span>
+    <div class="custom-select" id="csTo"></div>
+    <div class="pct-row">
+      <div class="pct-track" id="pctToTrack">
+        <div class="pct-fill" id="pctToFill"></div>
+        <div class="pct-thumb" id="pctToThumb"></div>
+      </div>
+      <span class="pct-label" id="pctToVal">0%</span>
+    </div>
+  </div>
 
-    const TIER_COLOR = {
-      bronze:"#cd7f32", silver:"#aaa", gold:"#ffd700",
-      platinum:"#4dd0e1", diamond:"#5c9bfa", master:"#c678dd", grandmaster:"#ff9800"
-    };
+  <div class="field" style="margin-bottom:18px">
+    <span class="field-label">Role</span>
+    <div class="custom-select" id="csRole"></div>
+  </div>
 
-    const STEP_PRICE = {
-      bronze5:0.902,bronze4:0.902,bronze3:0.902,bronze2:0.902,bronze1:0.902,
-      silver5:1.462,silver4:1.462,silver3:1.462,silver2:1.462,silver1:1.462,
-      gold5:2.262,gold4:2.262,gold3:2.262,gold2:2.262,gold1:2.262,
-      platinum5:3.462,platinum4:3.462,platinum3:3.462,platinum2:3.462,platinum1:3.462,
-      diamond5:6.534,diamond4:6.534,diamond3:6.534,diamond2:6.534,diamond1:6.534,
-      master5:13.75,master4:16.78,master3:20.47,master2:25.00,master1:25.00,
-      grandmaster5:44.00,grandmaster4:61.47,grandmaster3:85.87,grandmaster2:120.00,
-    };
+  <div class="checkboxes">
+    <label class="check-label"><input type="checkbox" id="duoBoost"><span class="check-box"></span>Duo Boost<span class="check-tag">+70%</span></label>
+    <label class="check-label"><input type="checkbox" id="stream"><span class="check-box"></span>Stream<span class="check-tag">+5%</span></label>
+  </div>
+  <div class="checkboxes">
+    <label class="check-label free"><input type="checkbox" id="offline"><span class="check-box"></span>Offline Mode<span class="check-tag">Free</span></label>
+    <label class="check-label free"><input type="checkbox" id="vpn" checked><span class="check-box"></span>VPN<span class="check-tag">Free</span></label>
+  </div>
 
-    const ROLES = [
-      ["tank",   "Tank",    1.00,1.15],
-      ["dd",     "DD",      1.00,1.05],
-      ["support","Support", 1.15,1.00],
-      ["openq",  "Open Q",  1.00,1.00],
+  <div class="progress-wrap">
+    <div class="progress-track" id="progressTrack">
+      <div class="progress-bg"></div>
+      <div class="progress-fill" id="progressFill"></div>
+      <div class="progress-dot" id="dotFrom"><div class="dot-tooltip" id="tipFrom"></div></div>
+      <div class="progress-dot" id="dotTo"><div class="dot-tooltip" id="tipTo"></div></div>
+    </div>
+    <div class="progress-labels" id="progressLabels"></div>
+  </div>
+
+  <div class="price-box">
+    <div class="price-meta">Total Price</div>
+    <div class="price-original" id="priceOriginal"></div>
+    <div class="price-value" id="priceOutput">—</div>
+    <div class="price-badge" id="priceBadge"></div>
+  </div>
+
+  <button class="copy-btn" id="copyBtn">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+      <path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+    Copy Order
+  </button>
+</div>
+
+<script>
+  const TIERS = ["bronze","silver","gold","platinum","diamond","master","grandmaster"];
+  const DIVS  = [5,4,3,2,1];
+  const DIV_LABEL = {5:"V",4:"IV",3:"III",2:"II",1:"I"};
+
+  const TIER_META = {
+    bronze:      {label:"Bronze",      color:"#a0522d", bg:"rgba(160,82,45,0.18)",   symbol:"▲"},
+    silver:      {label:"Silver",      color:"#b0b8c8", bg:"rgba(176,184,200,0.18)", symbol:"◆"},
+    gold:        {label:"Gold",        color:"#f0b429", bg:"rgba(240,180,41,0.18)",  symbol:"★"},
+    platinum:    {label:"Platinum",    color:"#3ecfcf", bg:"rgba(62,207,207,0.18)",  symbol:"◈"},
+    diamond:     {label:"Diamond",     color:"#4a9eff", bg:"rgba(74,158,255,0.18)",  symbol:"◇"},
+    master:      {label:"Master",      color:"#3ddc84", bg:"rgba(61,220,132,0.18)",  symbol:"⬡"},
+    grandmaster: {label:"Grandmaster", color:"#f5a623", bg:"rgba(245,166,35,0.18)",  symbol:"♛"},
+  };
+
+  const STEP_PRICE = {
+    bronze5:0.587,bronze4:0.587,bronze3:0.587,bronze2:0.587,bronze1:0.587,
+    silver5:0.950,silver4:0.950,silver3:0.950,silver2:0.950,silver1:0.950,
+    gold5:1.470,gold4:1.470,gold3:1.470,gold2:1.470,gold1:1.470,
+    platinum5:2.250,platinum4:2.250,platinum3:2.250,platinum2:2.250,platinum1:2.250,
+    diamond5:4.247,diamond4:4.247,diamond3:4.247,diamond2:4.247,diamond1:4.247,
+    master5:8.938,master4:10.907,master3:13.306,master2:16.250,master1:16.250,
+    grandmaster5:28.600,grandmaster4:39.956,grandmaster3:55.816,grandmaster2:78.000,
+  };
+
+  const ROLES = [
+    {value:"tank",    label:"Tank",    solo:1.00, duo:1.15},
+    {value:"dd",      label:"DD",      solo:1.00, duo:1.05},
+    {value:"support", label:"Support", solo:1.15, duo:1.00},
+    {value:"openq",   label:"Open Q",  solo:1.00, duo:1.00},
+  ];
+
+  const DISCOUNT = [0,0,0.05,0.10,0.15,0.15,0.15];
+
+  const RANKS = TIERS.flatMap(tier =>
+    DIVS.map(div => ({key:`${tier}${div}`, label:`${TIER_META[tier].label} ${DIV_LABEL[div]}`, tier, div}))
+  );
+  const TOTAL = RANKS.length;
+
+  // State
+  let fromIdx = RANKS.findIndex(r => r.key === "gold5");
+  let toIdx   = RANKS.findIndex(r => r.key === "diamond5");
+  let roleVal = "tank";
+  let isDuo   = false;
+  let pctFrom = 0;
+  let pctTo   = 0;
+
+  const $ = id => document.getElementById(id);
+  const idxToPct = i => (i / (TOTAL - 1)) * 100;
+
+  // Color at position 0-100% along the static gradient
+  function gradientColor(posPct) {
+    const stops = [
+      {p:0,     r:160,g:82, b:45 },
+      {p:16.6,  r:176,g:184,b:200},
+      {p:33.2,  r:240,g:180,b:41 },
+      {p:50,    r:62, g:207,b:207},
+      {p:66.6,  r:74, g:158,b:255},
+      {p:83.2,  r:61, g:220,b:132},
+      {p:100,   r:245,g:166,b:35 },
     ];
-
-    const DISCOUNT = [0,0,0.05,0.10,0.15,0.15,0.15];
-
-    const RANKS = TIERS.flatMap(tier =>
-      DIVS.map(div => ({
-        key: `${tier}${div}`,
-        label: `${tier.charAt(0).toUpperCase()+tier.slice(1)} ${["V","IV","III","II","I"][5-div]}`,
-        tier, div,
-      }))
-    );
-    const TOTAL = RANKS.length; // 35
-
-    const $ = id => document.getElementById(id);
-
-    // ── Helpers ──────────────────────────────────────────────────────────────
-    function stepPrice(tier, div) { return STEP_PRICE[`${tier}${div}`] ?? 0; }
-
-    function calcBase(fromIdx, toIdx) {
-      let t = 0;
-      for (let i = fromIdx; i < toIdx; i++) t += stepPrice(RANKS[i].tier, RANKS[i].div);
-      return t;
+    let a = stops[0], b = stops[stops.length-1];
+    for (let i=0; i<stops.length-1; i++) {
+      if (posPct >= stops[i].p && posPct <= stops[i+1].p) { a=stops[i]; b=stops[i+1]; break; }
     }
+    const t = (b.p===a.p) ? 0 : (posPct-a.p)/(b.p-a.p);
+    return `rgb(${Math.round(a.r+(b.r-a.r)*t)},${Math.round(a.g+(b.g-a.g)*t)},${Math.round(a.b+(b.b-a.b)*t)})`;
+  }
 
-    function applyMults(base, isDuo, isStream, roleValue) {
-      let t = base;
-      if (isDuo)    t *= 1.70;
-      if (isStream) t *= 1.05;
-      const role = ROLES.find(r => r[0] === roleValue);
-      if (role) t *= isDuo ? role[3] : role[2];
-      return t;
+  function rankIcon(tier, size=22) {
+    const m = TIER_META[tier];
+    return `<span class="rank-icon" style="width:${size}px;height:${size}px;background:${m.bg};color:${m.color};font-size:${Math.round(size*0.45)}px">${m.symbol}</span>`;
+  }
+
+  function stepPrice(tier, div) { return STEP_PRICE[`${tier}${div}`] ?? 0; }
+
+  function calcBase(fIdx, tIdx, pFrom, pTo) {
+    if (fIdx === tIdx) return 0;
+    let total = 0;
+    for (let i = fIdx; i < tIdx; i++) {
+      const price = stepPrice(RANKS[i].tier, RANKS[i].div);
+      total += (i === fIdx) ? price * ((100 - pFrom) / 100) : price;
     }
+    total -= stepPrice(RANKS[tIdx].tier, RANKS[tIdx].div) * (pTo / 100);
+    return Math.max(0, total);
+  }
 
-    function tiersSpanned(fromIdx, toIdx) {
-      return TIERS.indexOf(RANKS[toIdx].tier) - TIERS.indexOf(RANKS[fromIdx].tier);
-    }
+  function applyMults(base) {
+    let t = base;
+    if (isDuo) t *= 1.70;
+    if ($("stream").checked) t *= 1.05;
+    const role = ROLES.find(r => r.value === roleVal);
+    if (role) t *= isDuo ? role.duo : role.solo;
+    return t;
+  }
 
-    function pct(idx) { return (idx / (TOTAL - 1)) * 100; }
+  function tiersSpanned(fIdx, tIdx) {
+    return TIERS.indexOf(RANKS[tIdx].tier) - TIERS.indexOf(RANKS[fIdx].tier);
+  }
 
-    // ── Fill selects ─────────────────────────────────────────────────────────
-    function fillRankSelect(el, selectedKey) {
-      el.innerHTML = "";
-      RANKS.forEach(({ key, label }) => {
-        const opt = new Option(label, key);
-        if (key === selectedKey) opt.selected = true;
-        el.add(opt);
-      });
-    }
+  // ── Custom rank select ──────────────────────────────────────────────────────
+  function buildRankSelect(containerId, initialIdx, onChange) {
+    const container = $(containerId);
+    let cur = initialIdx;
+    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
+    const getLabel = i => `${rankIcon(RANKS[i].tier)} <span class="cs-label">${RANKS[i].label}</span>`;
 
-    function fillRoleSelect(isDuo, currentValue) {
-      const el = $("role");
-      el.innerHTML = "";
-      ROLES.forEach(([value, label, sm, dm]) => {
-        const mult = isDuo ? dm : sm;
-        const sfx  = mult !== 1 ? ` (+${Math.round((mult-1)*100)}%)` : "";
-        el.add(new Option(label + sfx, value));
-      });
-      if (currentValue) el.value = currentValue;
-    }
+    const trigger = document.createElement("div");
+    trigger.className = "cs-trigger";
+    trigger.innerHTML = getLabel(cur) + ARROW;
 
-    // ── Progress bar visuals ─────────────────────────────────────────────────
-    function updateProgress(fromIdx, toIdx) {
-      const fp = pct(fromIdx), tp = pct(toIdx);
-      const c1 = TIER_COLOR[RANKS[fromIdx].tier];
-      const c2 = TIER_COLOR[RANKS[toIdx].tier];
-      $("progressFill").style.cssText =
-        `left:${fp}%;width:${tp-fp}%;background:linear-gradient(90deg,${c1},${c2});`;
-      $("dotFrom").style.left = fp + "%";
-      $("dotTo").style.left   = tp + "%";
-      $("tipFrom").textContent = RANKS[fromIdx].label;
-      $("tipTo").textContent   = RANKS[toIdx].label;
-    }
+    const dropdown = document.createElement("div");
+    dropdown.className = "cs-dropdown";
 
-    function buildLabels() {
-      const el = $("progressLabels");
-      el.innerHTML = "";
-      TIERS.forEach(t => {
-        const span = document.createElement("span");
-        span.textContent = t.slice(0,2).toUpperCase();
-        span.style.color = TIER_COLOR[t];
-        el.appendChild(span);
-      });
-    }
-
-    // ── Render price ─────────────────────────────────────────────────────────
-    function render() {
-      const fromIdx = RANKS.findIndex(r => r.key === $("currentRank").value);
-      const toIdx   = RANKS.findIndex(r => r.key === $("desiredRank").value);
-      const isDuo   = $("duoBoost").checked;
-      const out     = $("priceOutput");
-
-      if (toIdx <= fromIdx) {
-        out.textContent = "Choose a higher rank";
-        out.className   = "price-value error";
-        $("priceOriginal").textContent = "";
-        $("priceBadge").textContent    = "";
-        return;
+    let lastTier = null;
+    RANKS.forEach((rank, idx) => {
+      if (rank.tier !== lastTier) {
+        const h = document.createElement("div");
+        h.className = "cs-group-header";
+        h.innerHTML = `<span style="color:${TIER_META[rank.tier].color}">${TIER_META[rank.tier].label}</span>`;
+        dropdown.appendChild(h);
+        lastTier = rank.tier;
       }
-
-      updateProgress(fromIdx, toIdx);
-
-      const base     = calcBase(fromIdx, toIdx);
-      const noDisc   = applyMults(base, isDuo, $("stream").checked, $("role").value);
-      const discRate = DISCOUNT[Math.min(tiersSpanned(fromIdx, toIdx), DISCOUNT.length-1)];
-      const final    = noDisc * (1 - discRate);
-
-      out.className   = "price-value";
-      out.textContent = "$" + final.toFixed(2);
-
-      if (discRate > 0) {
-        $("priceOriginal").textContent = "$" + noDisc.toFixed(2);
-        $("priceBadge").textContent    = `Save $${(noDisc-final).toFixed(2)} (${discRate*100}% off)`;
-      } else {
-        $("priceOriginal").textContent = "";
-        $("priceBadge").textContent    = "";
-      }
-    }
-
-    // ── Drag logic ───────────────────────────────────────────────────────────
-    function makeDraggable(dotEl, isFrom) {
-      let dragging = false;
-
-      function onMove(clientX) {
-        const track  = $("progressTrack");
-        const rect   = track.getBoundingClientRect();
-        const ratio  = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-        const rawIdx = Math.round(ratio * (TOTAL - 1));
-
-        const fromIdx = RANKS.findIndex(r => r.key === $("currentRank").value);
-        const toIdx   = RANKS.findIndex(r => r.key === $("desiredRank").value);
-
-        if (isFrom) {
-          // from dot: if it would overtake toIdx, push toIdx forward together
-          const newFrom = Math.min(rawIdx, TOTAL - 2);
-          if (newFrom >= toIdx) {
-            const newTo = Math.min(newFrom + 1, TOTAL - 1);
-            $("desiredRank").value = RANKS[newTo].key;
-          }
-          $("currentRank").value = RANKS[newFrom].key;
-        } else {
-          // to dot: can't go before fromIdx
-          const clamped = Math.max(rawIdx, fromIdx + 1);
-          $("desiredRank").value = RANKS[clamped].key;
-        }
-        render();
-      }
-
-      // Mouse
-      dotEl.addEventListener("mousedown", e => {
-        dragging = true;
-        dotEl.classList.add("dragging");
-        e.preventDefault();
+      const opt = document.createElement("div");
+      opt.className = "cs-option" + (idx===cur?" selected":"");
+      opt.dataset.idx = idx;
+      opt.innerHTML = `${rankIcon(rank.tier,18)} ${rank.label}`;
+      opt.addEventListener("click", () => {
+        cur = idx;
+        trigger.innerHTML = getLabel(cur) + ARROW;
+        dropdown.querySelectorAll(".cs-option").forEach(o => o.classList.toggle("selected", +o.dataset.idx===cur));
+        container.classList.remove("open");
+        onChange(cur);
       });
-      document.addEventListener("mousemove", e => {
-        if (dragging) onMove(e.clientX);
-      });
-      document.addEventListener("mouseup", () => {
-        if (dragging) { dragging = false; dotEl.classList.remove("dragging"); }
-      });
-
-      // Touch
-      dotEl.addEventListener("touchstart", e => {
-        dragging = true;
-        dotEl.classList.add("dragging");
-        e.preventDefault();
-      }, { passive: false });
-      document.addEventListener("touchmove", e => {
-        if (dragging) onMove(e.touches[0].clientX);
-      }, { passive: true });
-      document.addEventListener("touchend", () => {
-        if (dragging) { dragging = false; dotEl.classList.remove("dragging"); }
-      });
-    }
-
-    // ── Init ─────────────────────────────────────────────────────────────────
-    fillRankSelect($("currentRank"), "gold5");
-    fillRankSelect($("desiredRank"), "diamond5");
-    fillRoleSelect(false, "tank");
-    buildLabels();
-    render();
-
-    makeDraggable($("dotFrom"), true);
-    makeDraggable($("dotTo"),   false);
-
-    $("currentRank").addEventListener("change", () => {
-      const fromIdx = RANKS.findIndex(r => r.key === $("currentRank").value);
-      const toIdx   = RANKS.findIndex(r => r.key === $("desiredRank").value);
-      if (toIdx <= fromIdx) $("desiredRank").value = RANKS[fromIdx+1]?.key ?? RANKS[fromIdx].key;
-      render();
+      dropdown.appendChild(opt);
     });
-    $("desiredRank").addEventListener("change", render);
-    $("role").addEventListener("change", render);
-    $("stream").addEventListener("change", render);
-    $("duoBoost").addEventListener("change", () => {
-      fillRoleSelect($("duoBoost").checked, $("role").value);
-      render();
+
+    trigger.addEventListener("click", e => {
+      e.stopPropagation();
+      const was = container.classList.contains("open");
+      document.querySelectorAll(".custom-select.open").forEach(el => el.classList.remove("open"));
+      if (!was) { container.classList.add("open"); dropdown.querySelector(".selected")?.scrollIntoView({block:"nearest"}); }
     });
-  </script>
+
+    container.appendChild(trigger);
+    container.appendChild(dropdown);
+    return {
+      setIdx(idx) {
+        cur = idx;
+        trigger.innerHTML = getLabel(cur) + ARROW;
+        dropdown.querySelectorAll(".cs-option").forEach(o => o.classList.toggle("selected", +o.dataset.idx===cur));
+      }
+    };
+  }
+
+  // ── Role select ─────────────────────────────────────────────────────────────
+  function buildRoleSelect(containerId) {
+    const container = $(containerId);
+    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
+    const trigger = document.createElement("div"); trigger.className = "cs-trigger";
+    const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
+
+    const sfx = role => { const m=isDuo?role.duo:role.solo; return m!==1?` <span style="color:var(--orange);font-size:11px">+${Math.round((m-1)*100)}%</span>`:""; };
+    function refresh() {
+      dropdown.innerHTML = "";
+      ROLES.forEach(role => {
+        const opt = document.createElement("div");
+        opt.className = "cs-option"+(role.value===roleVal?" selected":"");
+        opt.innerHTML = role.label+sfx(role);
+        opt.addEventListener("click", () => { roleVal=role.value; container.classList.remove("open"); refreshTrigger(); refresh(); render(); });
+        dropdown.appendChild(opt);
+      });
+    }
+    function refreshTrigger() { const r=ROLES.find(r=>r.value===roleVal); trigger.innerHTML=`<span class="cs-label">${r.label}${sfx(r)}</span>${ARROW}`; }
+    trigger.addEventListener("click", e => { e.stopPropagation(); const was=container.classList.contains("open"); document.querySelectorAll(".custom-select.open").forEach(el=>el.classList.remove("open")); if(!was)container.classList.add("open"); });
+    refreshTrigger(); refresh();
+    container.appendChild(trigger); container.appendChild(dropdown);
+    return {refresh, refreshTrigger};
+  }
+
+  // ── Pct slider (smooth gradient color) ─────────────────────────────────────
+  function buildPctSlider(trackId, thumbId, fillId, valId, getPosPct, onChange) {
+    const track=$(trackId), thumb=$(thumbId), fill=$(fillId), valEl=$(valId);
+    let val=0, dragging=false;
+
+    function paint(v) {
+      const pPct = getPosPct();
+      const col = gradientColor(pPct);
+      fill.style.cssText = `width:${v}%;background:linear-gradient(90deg,${gradientColor(pPct - 3)},${col})`;
+      thumb.style.cssText = `left:${v}%;background:${col};border-color:var(--surface)`;
+      valEl.textContent = v + "%";
+      valEl.style.color = col;
+    }
+
+    function setVal(v, silent) {
+      val = Math.max(0, Math.min(99, Math.round(v)));
+      paint(val);
+      if (!silent) onChange(val);
+    }
+
+    function fromClientX(cx) {
+      const rect = track.getBoundingClientRect();
+      return ((cx - rect.left) / rect.width) * 99;
+    }
+
+    track.addEventListener("click", e => setVal(fromClientX(e.clientX)));
+
+    thumb.addEventListener("mousedown", e => { dragging=true; thumb.classList.add("dragging"); e.preventDefault(); });
+    document.addEventListener("mousemove", e => { if(dragging) setVal(fromClientX(e.clientX)); });
+    document.addEventListener("mouseup", () => { if(dragging){dragging=false;thumb.classList.remove("dragging");} });
+
+    thumb.addEventListener("touchstart", e => { dragging=true; thumb.classList.add("dragging"); e.preventDefault(); },{passive:false});
+    document.addEventListener("touchmove", e => { if(dragging) setVal(fromClientX(e.touches[0].clientX)); },{passive:true});
+    document.addEventListener("touchend", () => { if(dragging){dragging=false;thumb.classList.remove("dragging");} });
+
+    setVal(0, true);
+    return { setVal, getVal:()=>val, repaint:()=>paint(val) };
+  }
+
+  // ── Progress bar ────────────────────────────────────────────────────────────
+  function buildTierTicks() {
+    const track = $("progressTrack");
+    TIERS.slice(1).forEach(tier => {
+      const idx = RANKS.findIndex(r => r.tier===tier && r.div===5);
+      const tick = document.createElement("div");
+      tick.className = "progress-tick";
+      tick.style.left = idxToPct(idx) + "%";
+      track.insertBefore(tick, track.firstChild);
+    });
+  }
+
+  function buildProgressLabels() {
+    const el = $("progressLabels");
+    TIERS.forEach((tier, ti) => {
+      // Center of this tier: average pct of its 5 divisions
+      const indices = DIVS.map(div => RANKS.findIndex(r => r.tier===tier && r.div===div));
+      const centerPct = indices.reduce((sum,i) => sum + idxToPct(i), 0) / indices.length;
+      const span = document.createElement("span");
+      span.textContent = tier==="grandmaster" ? "GM" : tier.slice(0,2).toUpperCase();
+      span.style.left = centerPct + "%";
+      span.style.color = TIER_META[tier].color;
+      el.appendChild(span);
+    });
+  }
+
+  function updateProgress() {
+    const fp = idxToPct(fromIdx), tp = idxToPct(toIdx);
+    const c1 = gradientColor(fp), c2 = gradientColor(tp);
+
+    // Fill: use background-position trick so gradient aligns with static bg
+    $("progressFill").style.left  = fp + "%";
+    $("progressFill").style.width = (tp - fp) + "%";
+    // Shift the gradient background-position so colors align with the static rainbow
+    $("progressFill").style.backgroundPositionX = `-${(fp / 100) * 460}px`;
+
+    $("dotFrom").style.left = fp + "%"; $("dotFrom").style.background = c1;
+    $("dotTo").style.left   = tp + "%"; $("dotTo").style.background   = c2;
+    $("tipFrom").textContent = RANKS[fromIdx].label;
+    $("tipTo").textContent   = RANKS[toIdx].label;
+
+    // Repaint pct sliders to match new tier color
+    sliderFrom.repaint();
+    sliderTo.repaint();
+  }
+
+  // ── Render ──────────────────────────────────────────────────────────────────
+  function render() {
+    updateProgress();
+    csFrom.setIdx(fromIdx);
+    csTo.setIdx(toIdx);
+
+    const out = $("priceOutput");
+    if (toIdx <= fromIdx) {
+      out.textContent = "Choose a higher rank"; out.className = "price-value error";
+      $("priceOriginal").textContent = "";
+      const badge = $("priceBadge"); badge.textContent = ""; badge.classList.remove("active");
+      return;
+    }
+
+    const base     = calcBase(fromIdx, toIdx, pctFrom, pctTo);
+    const noDisc   = applyMults(base);
+    const discRate = DISCOUNT[Math.min(tiersSpanned(fromIdx,toIdx), DISCOUNT.length-1)];
+    const final    = noDisc * (1-discRate);
+
+    out.className = "price-value";
+    out.textContent = "$" + final.toFixed(2);
+
+    const badge = $("priceBadge");
+    if (discRate > 0) {
+      $("priceOriginal").textContent = "$" + noDisc.toFixed(2);
+      badge.textContent = `Save $${(noDisc-final).toFixed(2)} (${discRate*100}% off)`;
+      badge.classList.add("active");
+    } else {
+      $("priceOriginal").textContent = "";
+      badge.textContent = ""; badge.classList.remove("active");
+    }
+  }
+
+  // ── Main bar drag ───────────────────────────────────────────────────────────
+  function makeDraggable(dotEl, isFrom) {
+    let dragging = false;
+    function onMove(cx) {
+      const rect = $("progressTrack").getBoundingClientRect();
+      const raw  = Math.round(Math.max(0,Math.min(1,(cx-rect.left)/rect.width)) * (TOTAL-1));
+      if (isFrom) { const nf=Math.min(raw,TOTAL-2); if(nf>=toIdx)toIdx=Math.min(nf+1,TOTAL-1); fromIdx=nf; }
+      else        { const nt=Math.max(raw,1);        if(nt<=fromIdx)fromIdx=Math.max(nt-1,0);   toIdx=nt;   }
+      render();
+    }
+    dotEl.addEventListener("mousedown", e=>{dragging=true;dotEl.classList.add("dragging");e.preventDefault();});
+    document.addEventListener("mousemove", e=>{if(dragging)onMove(e.clientX);});
+    document.addEventListener("mouseup", ()=>{if(dragging){dragging=false;dotEl.classList.remove("dragging");}});
+    dotEl.addEventListener("touchstart", e=>{dragging=true;dotEl.classList.add("dragging");e.preventDefault();},{passive:false});
+    document.addEventListener("touchmove", e=>{if(dragging)onMove(e.touches[0].clientX);},{passive:true});
+    document.addEventListener("touchend", ()=>{if(dragging){dragging=false;dotEl.classList.remove("dragging");}});
+  }
+
+  // ── Copy order ──────────────────────────────────────────────────────────────
+  function copyOrder() {
+    const priceEl = $("priceOutput");
+    if (!priceEl || priceEl.classList.contains("error")) return;
+    const price = priceEl.textContent;
+    const role  = ROLES.find(r=>r.value===roleVal);
+    const opts  = [];
+    if (isDuo)                opts.push("Duo Boost");
+    if ($("stream").checked)  opts.push("Stream");
+    if ($("offline").checked) opts.push("Offline Mode");
+    if ($("vpn").checked)     opts.push("VPN");
+
+    const text = [
+      "🎮 Overwatch Boost Order",
+      "─────────────────────",
+      `From:    ${RANKS[fromIdx].label} (${pctFrom}%)`,
+      `To:      ${RANKS[toIdx].label} (${pctTo}%)`,
+      `Role:    ${role.label}`,
+      opts.length ? `Options: ${opts.join(", ")}` : null,
+      "─────────────────────",
+      `Total:   ${price}`,
+    ].filter(Boolean).join("\n");
+
+    const btn = $("copyBtn");
+    const ICON_COPY = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+    const ICON_CHECK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+    function showCopied() {
+      btn.classList.add("copied"); btn.innerHTML = ICON_CHECK + " Copied!";
+      setTimeout(() => { btn.classList.remove("copied"); btn.innerHTML = ICON_COPY + " Copy Order"; }, 2000);
+    }
+
+    // Try modern API first, fallback to execCommand
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopy(text, showCopied));
+    } else {
+      fallbackCopy(text, showCopied);
+    }
+  }
+
+  function fallbackCopy(text, cb) {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,99999);
+    try { document.execCommand("copy"); cb(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  // ── Init ────────────────────────────────────────────────────────────────────
+  const csFrom = buildRankSelect("csFrom", fromIdx, idx => {
+    fromIdx = idx; if(toIdx<=fromIdx) toIdx=Math.min(fromIdx+1,TOTAL-1); render();
+  });
+  const csTo = buildRankSelect("csTo", toIdx, idx => {
+    toIdx = idx; if(fromIdx>=toIdx) fromIdx=Math.max(toIdx-1,0); render();
+  });
+  const csRole = buildRoleSelect("csRole");
+
+  const sliderFrom = buildPctSlider(
+    "pctFromTrack","pctFromThumb","pctFromFill","pctFromVal",
+    () => idxToPct(fromIdx),
+    v => { pctFrom=v; render(); }
+  );
+  const sliderTo = buildPctSlider(
+    "pctToTrack","pctToThumb","pctToFill","pctToVal",
+    () => idxToPct(toIdx),
+    v => { pctTo=v; render(); }
+  );
+
+  buildProgressLabels();
+  buildTierTicks();
+  makeDraggable($("dotFrom"), true);
+  makeDraggable($("dotTo"),   false);
+
+  $("duoBoost").addEventListener("change", () => { isDuo=$("duoBoost").checked; csRole.refreshTrigger(); csRole.refresh(); render(); });
+  $("stream").addEventListener("change", render);
+  $("copyBtn").addEventListener("click", copyOrder);
+  document.addEventListener("click", () => document.querySelectorAll(".custom-select.open").forEach(el=>el.classList.remove("open")));
+
+  render();
+</script>
 </body>
 </html>
