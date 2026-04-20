@@ -440,6 +440,92 @@
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
     .price-badge.active { animation: badgeIn 0.25s ease; }
+
+    /* Mode switcher */
+    .mode-switch {
+      display: flex;
+      background: var(--bg3);
+      border: 1.5px solid var(--edge);
+      border-radius: var(--r);
+      padding: 3px;
+      margin-bottom: 20px;
+      gap: 3px;
+    }
+    .mode-btn {
+      flex: 1; padding: 8px;
+      border: none; border-radius: 7px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px; font-weight: 800;
+      cursor: pointer; letter-spacing: 0.3px;
+      transition: background 0.2s, color 0.2s;
+      background: transparent; color: var(--dim);
+    }
+    .mode-btn.active {
+      background: var(--hero);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(108,143,255,0.4);
+    }
+
+    /* Placements panel */
+    .pl-panel { display: none; }
+    .pl-panel.active { display: block; }
+
+    /* Win count selector */
+    .win-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .win-btn {
+      padding: 10px 0;
+      border: 1.5px solid var(--edge);
+      border-radius: 8px;
+      background: var(--bg3);
+      color: var(--mist);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 900;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      text-align: center;
+    }
+    .win-btn.active {
+      border-color: var(--hero);
+      background: rgba(108,143,255,0.1);
+      color: var(--snow);
+    }
+
+    /* Boost method selector */
+    .method-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .method-btn {
+      padding: 11px 10px;
+      border: 1.5px solid var(--edge);
+      border-radius: var(--r);
+      background: var(--bg3);
+      color: var(--mist);
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px; font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .method-btn.active {
+      border-color: var(--hero);
+      background: rgba(108,143,255,0.08);
+      color: var(--snow);
+    }
+    .method-sub {
+      display: block;
+      font-size: 9px; font-weight: 600;
+      color: var(--dim); margin-top: 2px;
+      letter-spacing: 0.5px;
+    }
+    .method-btn.active .method-sub { color: var(--green); }
   </style>
 </head>
 <body>
@@ -448,11 +534,20 @@
 
   <div class="card">
     <div class="card-banner">
-      <div class="banner-title"><span>Overwatch</span> Rank Boost</div>
+      <div class="banner-title"><span>Overwatch</span> <span id="bannerMode">Rank Boost</span></div>
       
     </div>
 
     <div class="card-body">
+
+      <!-- Mode switcher -->
+      <div class="mode-switch">
+        <button class="mode-btn active" id="modeRank" onclick="switchMode('rank')">🏆 Rank Boost</button>
+        <button class="mode-btn" id="modePl" onclick="switchMode('placement')">🎯 Placements</button>
+      </div>
+
+      <!-- RANK BOOST PANEL -->
+      <div class="pl-panel active" id="rankPanel">
 
       <!-- Rank row -->
       <div class="sec-label">Your Route</div>
@@ -550,6 +645,76 @@
       <p style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5">
         Copy your order details, then send them to me on Discord
       </p>
+
+      </div><!-- end rankPanel -->
+
+      <!-- PLACEMENTS PANEL -->
+      <div class="pl-panel" id="placementPanel">
+
+        <div class="sec-label">Last Season Rank</div>
+        <div class="custom-select" id="csPlTier" style="margin-bottom:16px"></div>
+
+        <div class="sec-label">Games to Play</div>
+        <div class="win-grid">
+          <button class="win-btn" data-wins="1">1</button>
+          <button class="win-btn" data-wins="3">3</button>
+          <button class="win-btn active" data-wins="5">5</button>
+          <button class="win-btn" data-wins="10">10</button>
+        </div>
+
+        <div class="sec-label">Boost Method</div>
+        <div class="method-row">
+          <button class="method-btn active" id="methodPilot" onclick="setMethod('pilot')">
+            🎮 Piloted
+            <span class="method-sub">✓ 70% wins guaranteed</span>
+          </button>
+          <button class="method-btn" id="methodDuo" onclick="setMethod('duo')">
+            👥 Duo +70%
+            <span class="method-sub">No guarantee</span>
+          </button>
+        </div>
+
+        <div class="field">
+          <div class="sec-label">Role</div>
+          <div class="custom-select" id="csPlRole"></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="toggles" style="margin-bottom:20px">
+          <label class="tog free"><input type="checkbox" id="plOffline"><span class="tog-switch"></span>Offline<span class="tog-tag">Free</span></label>
+          <label class="tog free"><input type="checkbox" id="plVpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
+        </div>
+
+        <div class="price-box">
+          <div class="price-top">
+            <span class="price-meta">Total Price</span>
+            <div class="price-original" id="plOriginal"></div>
+          </div>
+          <div class="price-val" id="plOutput">—</div>
+          <div class="price-badge" id="plBadge"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="copy-btn" id="plCopyBtn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            Copy
+          </button>
+          <button class="order-btn" onclick="window.open('https://discord.gg/aP6vKM5e','_blank')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/>
+            </svg>
+            Discord
+          </button>
+        </div>
+        <p style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5">
+          Copy your order details, then send them to me on Discord
+        </p>
+
+      </div><!-- end placementPanel -->
 
     </div>
   </div>
@@ -947,6 +1112,201 @@
   });
   document.addEventListener("click",()=>document.querySelectorAll(".custom-select.open").forEach(el=>el.classList.remove("open")));
   render();
+
+  // ── PLACEMENTS MODE ──────────────────────────────────────────────────────
+  // Price per win = stepPrice of div5 in that tier (same as one division step)
+  const WIN_PRICE = {
+    unranked:    0.30,
+    bronze:      0.45,
+    silver:      0.95,
+    gold:        1.47,
+    platinum:    2.25,
+    diamond:     4.25,
+    master:      6.50,
+    grandmaster: 12.50,
+  };
+  const PL_TIERS = ["unranked", ...TIERS];
+  const PL_TIER_META = {
+    unranked: {label:"Unranked", color:"#6a7080", bg:"rgba(106,112,128,0.18)", symbol:"?"},
+    ...TIER_META
+  };
+
+  let plTier   = "gold";
+  let plGames  = 5;
+
+  let plMethod = "pilot"; // "pilot" | "duo"
+  let plRole   = "tank";
+
+  // Build placement tier select
+  function buildPlTierSelect() {
+    const container = $("csPlTier");
+    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
+    const trigger = document.createElement("div"); trigger.className = "cs-trigger";
+    const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
+
+    function getLabel(tier) {
+      const m = PL_TIER_META[tier];
+      return `<span class="rank-icon" style="width:20px;height:20px;background:${m.bg};color:${m.color};font-size:9px">${m.symbol}</span> <span class="cs-label">${m.label}</span>`;
+    }
+    trigger.innerHTML = getLabel(plTier) + ARROW;
+
+    PL_TIERS.forEach(tier => {
+      const opt = document.createElement("div");
+      opt.className = "cs-option" + (tier === plTier ? " selected" : "");
+      const m = PL_TIER_META[tier];
+      opt.dataset.tier = tier;
+      opt.innerHTML = `<span class="rank-icon" style="width:18px;height:18px;background:${m.bg};color:${m.color};font-size:8px">${m.symbol}</span> ${m.label}`;
+      opt.addEventListener("click", () => {
+        plTier = tier;
+        trigger.innerHTML = getLabel(plTier) + ARROW;
+        dropdown.querySelectorAll(".cs-option").forEach(o => o.classList.toggle("selected", o.dataset.tier === tier));
+        container.classList.remove("open");
+        renderPl();
+      });
+      dropdown.appendChild(opt);
+    });
+
+    trigger.addEventListener("click", e => {
+      e.stopPropagation();
+      const was = container.classList.contains("open");
+      document.querySelectorAll(".custom-select.open").forEach(el => el.classList.remove("open"));
+      if (!was) container.classList.add("open");
+    });
+    container.appendChild(trigger);
+    container.appendChild(dropdown);
+  }
+
+  // Build placement role select
+  function buildPlRoleSelect() {
+    const container = $("csPlRole");
+    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
+    const trigger = document.createElement("div"); trigger.className = "cs-trigger";
+    const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
+
+    function roleSfx(rv) {
+      const role = ROLES.find(r => r.value === rv);
+      const mult = plMethod === "duo" ? role.duo : role.solo;
+      return mult !== 1 ? ` <span style="color:#6c8fff;font-size:10px">+${Math.round((mult-1)*100)}%</span>` : "";
+    }
+
+    function refresh() {
+      dropdown.innerHTML = "";
+      const h1 = document.createElement("div"); h1.className = "cs-group-header";
+      h1.innerHTML = `<span style="color:var(--dim)">Role Queue</span>`; dropdown.appendChild(h1);
+      ["tank","dd","support"].forEach(rv => {
+        const role = ROLES.find(r => r.value === rv);
+        const opt = document.createElement("div");
+        opt.className = "cs-option" + (plRole === rv ? " selected" : "");
+        opt.innerHTML = role.label + roleSfx(rv);
+        opt.addEventListener("click", () => { plRole = rv; container.classList.remove("open"); refreshTrigger(); refresh(); renderPl(); });
+        dropdown.appendChild(opt);
+      });
+      const div = document.createElement("div"); div.className = "cs-divider"; dropdown.appendChild(div);
+      const openq = ROLES.find(r => r.value === "openq");
+      const opt = document.createElement("div");
+      opt.className = "cs-option" + (plRole === "openq" ? " selected" : "");
+      opt.innerHTML = openq.label + roleSfx("openq");
+      opt.addEventListener("click", () => { plRole = "openq"; container.classList.remove("open"); refreshTrigger(); refresh(); renderPl(); });
+      dropdown.appendChild(opt);
+    }
+    function refreshTrigger() {
+      const role = ROLES.find(r => r.value === plRole);
+      trigger.innerHTML = `<span class="cs-label">${role.label}${roleSfx(plRole)}</span>${ARROW}`;
+    }
+    trigger.addEventListener("click", e => {
+      e.stopPropagation();
+      const was = container.classList.contains("open");
+      document.querySelectorAll(".custom-select.open").forEach(el => el.classList.remove("open"));
+      if (!was) container.classList.add("open");
+    });
+    refreshTrigger(); refresh();
+    container.appendChild(trigger); container.appendChild(dropdown);
+  }
+
+  function renderPl() {
+    const pricePerWin = WIN_PRICE[plTier] || 1;
+    // 70% guaranteed winrate, duo has no guarantee (show "est.")
+    const wins = plMethod === "pilot" ? plGames * 0.7 : plGames * 0.7;
+    let total = pricePerWin * wins;
+    if (plMethod === "duo") total *= 1.70;
+    const role = ROLES.find(r => r.value === plRole);
+    if (role) total *= plMethod === "duo" ? role.duo : role.solo;
+
+    const out = $("plOutput");
+    out.textContent = "$" + total.toFixed(2);
+    out.className = "price-val";
+
+    // Show wins info in badge
+    const badge = $("plBadge");
+    if (plMethod === "pilot") {
+      badge.textContent = `~${Math.round(plGames * 0.7)} wins guaranteed`;
+      badge.classList.add("active");
+    } else {
+      badge.textContent = `~${Math.round(plGames * 0.7)} wins expected`;
+      badge.classList.add("active");
+    }
+    $("plOriginal").textContent = "";
+  }
+
+  function setMethod(m) {
+    plMethod = m;
+    $("methodPilot").classList.toggle("active", m === "pilot");
+    $("methodDuo").classList.toggle("active", m === "duo");
+    // Rebuild role select to update % labels
+    $("csPlRole").innerHTML = "";
+    buildPlRoleSelect();
+    renderPl();
+  }
+
+  // Win buttons
+  document.querySelectorAll(".win-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".win-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      plGames = +btn.dataset.wins;
+      renderPl();
+    });
+  });
+
+  // Mode switcher
+  function switchMode(mode) {
+    const isRank = mode === "rank";
+    $("rankPanel").classList.toggle("active", isRank);
+    $("placementPanel").classList.toggle("active", !isRank);
+    $("modeRank").classList.toggle("active", isRank);
+    $("modePl").classList.toggle("active", !isRank);
+    $("bannerMode").textContent = isRank ? "Rank Boost" : "Placements";
+  }
+
+  // Placement copy order
+  $("plCopyBtn").addEventListener("click", () => {
+    const price = $("plOutput").textContent;
+    const role = ROLES.find(r => r.value === plRole);
+    const opts = [];
+    if ($("plOffline").checked) opts.push("Offline Mode");
+    if ($("plVpn").checked) opts.push("VPN");
+    const text = [
+      "🎯 Overwatch Placement Boost",
+      "─────────────────────",
+      `Last Season: ${TIER_META[plTier].label}`,
+      `Games: ${plGames} (~${Math.round(plGames * 0.7)} wins)`,
+      `Method: ${plMethod === "pilot" ? "Piloted (7 wins guaranteed)" : "Duo (no guarantee)"}`,
+      `Role: ${role.label}`,
+      opts.length ? `Options: ${opts.join(", ")}` : null,
+      "─────────────────────",
+      `Total: ${price}`,
+    ].filter(Boolean).join("\n");
+    const btn = $("plCopyBtn");
+    const IC = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+    const CK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    function showCopied() { btn.classList.add("copied"); btn.innerHTML = CK + " Copied!"; setTimeout(() => { btn.classList.remove("copied"); btn.innerHTML = IC + " Copy"; }, 2000); }
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopy(text, showCopied)); }
+    else fallbackCopy(text, showCopied);
+  });
+
+  buildPlTierSelect();
+  buildPlRoleSelect();
+  renderPl();
 </script>
 </body>
 </html>
