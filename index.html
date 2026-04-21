@@ -526,6 +526,53 @@
       letter-spacing: 0.5px;
     }
     .method-btn.active .method-sub { color: var(--green); }
+
+    /* Unified range slider */
+    .range-wrap { margin-bottom: 16px; }
+    .range-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .range-val { font-family: 'Fira Code', monospace; font-size: 13px; font-weight: 500; color: var(--hero); }
+    .range-input-row { display: flex; align-items: center; gap: 8px; }
+    .range-num-input {
+      width: 64px; padding: 6px 8px;
+      background: var(--bg3); border: 1.5px solid var(--edge);
+      border-radius: 6px; color: var(--snow);
+      font-family: 'Fira Code', monospace; font-size: 12px; font-weight: 500;
+      text-align: center;
+    }
+    .range-num-input:focus { outline: none; border-color: var(--hero); }
+
+    /* Dual range slider track */
+    .dual-range-wrap { position: relative; height: 6px; border-radius: 99px; margin: 10px 0 8px; cursor: pointer; }
+    .dual-range-bg { position: absolute; inset: 0; background: var(--edge); border-radius: 99px; }
+    .dual-range-fill { position: absolute; top: 0; height: 100%; border-radius: 99px; pointer-events: none; }
+    .dual-range-thumb {
+      position: absolute; top: 50%;
+      transform: translate(-50%, -50%);
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 3px solid var(--bg2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      cursor: grab; z-index: 2; touch-action: none;
+      transition: box-shadow 0.1s;
+    }
+    .dual-range-thumb:hover { box-shadow: 0 0 0 6px rgba(108,143,255,0.2); }
+    .dual-range-thumb.dragging { cursor: grabbing; box-shadow: 0 0 0 8px rgba(108,143,255,0.15); transition: none; }
+    .dual-range-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--dim); font-family: 'Fira Code', monospace; }
+
+    /* Single range */
+    .single-range-wrap { position: relative; height: 6px; border-radius: 99px; margin: 10px 0 8px; cursor: pointer; }
+    .single-range-bg { position: absolute; inset: 0; background: var(--edge); border-radius: 99px; }
+    .single-range-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 99px; background: var(--hero); pointer-events: none; }
+    .single-range-thumb {
+      position: absolute; top: 50%;
+      transform: translate(-50%, -50%);
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--hero);
+      border: 3px solid var(--bg2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      cursor: grab; z-index: 2; touch-action: none;
+    }
+    .single-range-thumb:hover { box-shadow: 0 0 0 6px rgba(108,143,255,0.2); }
+    .single-range-thumb.dragging { cursor: grabbing; box-shadow: 0 0 0 8px rgba(108,143,255,0.15); transition: none; }
   </style>
 </head>
 <body>
@@ -542,8 +589,10 @@
 
       <!-- Mode switcher -->
       <div class="mode-switch">
-        <button class="mode-btn active" id="modeRank" onclick="switchMode('rank')">🏆 Rank Boost</button>
-        <button class="mode-btn" id="modePl" onclick="switchMode('placement')">🎯 Placements</button>
+        <button class="mode-btn active" id="modeRank" onclick="switchMode('rank')">🏆 Rank</button>
+        <button class="mode-btn" id="modePl" onclick="switchMode('placement')">🎯 Placement</button>
+        <button class="mode-btn" id="modeBp" onclick="switchMode('battlepass')">⚡ Battle Pass</button>
+        <button class="mode-btn" id="modeDr" onclick="switchMode('drives')">🔥 Drives</button>
       </div>
 
       <!-- RANK BOOST PANEL -->
@@ -596,6 +645,7 @@
         <label class="tog"><input type="checkbox" id="stream"><span class="tog-switch"></span>Stream<span class="tog-tag">+5%</span></label>
         <label class="tog free"><input type="checkbox" id="offline"><span class="tog-switch"></span>Offline<span class="tog-tag">Free</span></label>
         <label class="tog free"><input type="checkbox" id="vpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
+        <label class="tog" style="grid-column:span 2"><input type="checkbox" id="rankPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
       </div>
 
       <!-- Progress bar -->
@@ -654,12 +704,17 @@
         <div class="sec-label">Last Season Rank</div>
         <div class="custom-select" id="csPlTier" style="margin-bottom:16px"></div>
 
-        <div class="sec-label">Games to Play</div>
-        <div class="win-grid">
-          <button class="win-btn" data-wins="1">1</button>
-          <button class="win-btn" data-wins="3">3</button>
-          <button class="win-btn active" data-wins="5">5</button>
-          <button class="win-btn" data-wins="10">10</button>
+        <div class="range-wrap">
+          <div class="range-header">
+            <span class="sec-label" style="margin-bottom:0">Games to Play</span>
+            <span class="range-val" id="plGamesVal">5 games</span>
+          </div>
+          <div class="single-range-wrap" id="plGamesTrack">
+            <div class="single-range-bg"></div>
+            <div class="single-range-fill" id="plGamesFill"></div>
+            <div class="single-range-thumb" id="plGamesThumb"></div>
+          </div>
+          <div class="dual-range-labels"><span>1</span><span>10</span></div>
         </div>
 
         <div class="sec-label">Boost Method</div>
@@ -682,6 +737,8 @@
         <div class="hr"></div>
 
         <div class="toggles" style="margin-bottom:20px">
+          <label class="tog"><input type="checkbox" id="plStream"><span class="tog-switch"></span>Stream<span class="tog-tag">+5%</span></label>
+          <label class="tog" style=""><input type="checkbox" id="plPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
           <label class="tog free"><input type="checkbox" id="plOffline"><span class="tog-switch"></span>Offline<span class="tog-tag">Free</span></label>
           <label class="tog free"><input type="checkbox" id="plVpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
         </div>
@@ -716,6 +773,121 @@
 
       </div><!-- end placementPanel -->
 
+      <!-- BATTLE PASS PANEL -->
+      <div class="pl-panel" id="bpPanel">
+
+        <div class="range-wrap">
+          <div class="range-header">
+            <span class="sec-label" style="margin-bottom:0">Level Range</span>
+            <span class="range-val" id="bpRangeVal">1 → 100</span>
+          </div>
+          <div class="dual-range-wrap" id="bpTrack">
+            <div class="dual-range-bg"></div>
+            <div class="dual-range-fill" id="bpFill"></div>
+            <div class="dual-range-thumb" id="bpThumbFrom" style="background:var(--mist)"></div>
+            <div class="dual-range-thumb" id="bpThumbTo" style="background:var(--hero)"></div>
+          </div>
+          <div class="dual-range-labels"><span>1</span><span>200</span></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="flex:1"><div class="rank-col-label">From</div><input type="number" id="bpFrom" min="1" max="199" value="1" class="range-num-input" style="width:100%"></div>
+            <div style="color:var(--dim);font-size:16px;padding-top:18px">→</div>
+            <div style="flex:1"><div class="rank-col-label">To</div><input type="number" id="bpTo" min="2" max="200" value="100" class="range-num-input" style="width:100%"></div>
+          </div>
+        </div>
+
+        <div class="sec-label">Role Preference</div>
+        <div class="method-row" style="margin-bottom:16px">
+          <button class="method-btn active" id="bpRoleAny" onclick="setBpRole('any')">
+            Any Role
+            <span class="method-sub">Standard price</span>
+          </button>
+          <button class="method-btn" id="bpRoleLock" onclick="setBpRole('lock')">
+            Role Lock
+            <span class="method-sub">+10%</span>
+          </button>
+        </div>
+
+        <div class="field" id="bpRoleLockField" style="display:none">
+          <div class="sec-label">Preferred Role</div>
+          <div class="custom-select" id="csBpRole"></div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="toggles" style="margin-bottom:20px">
+          <label class="tog"><input type="checkbox" id="bpStream"><span class="tog-switch"></span>Stream<span class="tog-tag">+5%</span></label>
+          <label class="tog"><input type="checkbox" id="bpPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
+          <label class="tog free"><input type="checkbox" id="bpOffline"><span class="tog-switch"></span>Offline<span class="tog-tag">Free</span></label>
+          <label class="tog free"><input type="checkbox" id="bpVpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
+        </div>
+
+        <div class="price-box">
+          <div class="price-top">
+            <span class="price-meta">Total Price</span>
+            <div class="price-original" id="bpOriginal"></div>
+          </div>
+          <div class="price-val" id="bpOutput">—</div>
+          <div class="price-badge" id="bpBadge"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="copy-btn" id="bpCopyBtn"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Copy</button>
+          <button class="order-btn" onclick="window.open('https://discord.gg/aP6vKM5e','_blank')"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg> Discord</button>
+        </div>
+        <p style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5">Copy your order details, then send them to me on Discord</p>
+
+      </div><!-- end bpPanel -->
+
+      <!-- COMPETITIVE DRIVES PANEL -->
+      <div class="pl-panel" id="drPanel">
+
+        <div class="sec-label">Your Rank</div>
+        <div class="custom-select" id="csDrTier" style="margin-bottom:16px"></div>
+
+        <div class="range-wrap">
+          <div class="range-header">
+            <span class="sec-label" style="margin-bottom:0">Drive Points</span>
+            <span class="range-val" id="drRangeVal">4000 pts</span>
+          </div>
+          <div class="dual-range-wrap" id="drTrack">
+            <div class="dual-range-bg"></div>
+            <div class="dual-range-fill" id="drFill"></div>
+            <div class="dual-range-thumb" id="drThumbFrom" style="background:var(--mist)"></div>
+            <div class="dual-range-thumb" id="drThumbTo" style="background:var(--hero)"></div>
+          </div>
+          <div class="dual-range-labels"><span>0</span><span>4000</span></div>
+          <div style="display:flex;gap:8px;margin-top:8px;margin-bottom:4px">
+            <div style="flex:1"><div class="rank-col-label">From</div><input type="number" id="drFrom" min="0" max="3999" value="0" class="range-num-input" style="width:100%"></div>
+            <div style="color:var(--dim);font-size:16px;padding-top:18px">→</div>
+            <div style="flex:1"><div class="rank-col-label">To</div><input type="number" id="drTo" min="1" max="4000" value="4000" class="range-num-input" style="width:100%"></div>
+          </div>
+          <div style="margin-bottom:8px;font-size:11px;color:var(--dim);text-align:center" id="drRangeLabel">4000 points (full drive)</div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="toggles" style="margin-bottom:20px">
+          <label class="tog"><input type="checkbox" id="drPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
+          <label class="tog free"><input type="checkbox" id="drVpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
+        </div>
+
+        <div class="price-box">
+          <div class="price-top">
+            <span class="price-meta">Total Price</span>
+            <div class="price-original" id="drOriginal"></div>
+          </div>
+          <div class="price-val" id="drOutput">—</div>
+          <div class="price-badge" id="drBadge"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="copy-btn" id="drCopyBtn"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Copy</button>
+          <button class="order-btn" onclick="window.open('https://discord.gg/aP6vKM5e','_blank')"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg> Discord</button>
+        </div>
+        <p style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5">Copy your order details, then send them to me on Discord</p>
+
+      </div><!-- end drPanel -->
+
     </div>
   </div>
 
@@ -743,7 +915,7 @@
     {value:"tank",    label:"Tank",    solo:1.00, duo:1.15, group:"main"},
     {value:"dd",      label:"DD",      solo:1.00, duo:1.05, group:"main"},
     {value:"support", label:"Support", solo:1.15, duo:1.00, group:"main"},
-    {value:"openq",   label:"Open Queue", solo:1.00, duo:1.00, group:"mode"},
+    {value:"openq",   label:"6v6", solo:1.00, duo:1.00, group:"mode"},
   ];
 
   const DISCOUNT = [0,0,0.05,0.10,0.15,0.15,0.15];
@@ -819,7 +991,8 @@
   function applyMults(base){
     let t=base;
     if(isDuo) t *= duoMultiplier();
-    if($("stream").checked)t*=1.05;
+    if($("stream").checked) t *= 1.05;
+    if($("rankPs").checked) t *= 1.50;
     const role=ROLES.find(r=>r.value===roleVal);
     if(role)t*=isDuo?role.duo:role.solo;
     return t;
@@ -883,7 +1056,7 @@
         opt.addEventListener("click",()=>{roleVal=role.value;container.classList.remove("open");refreshTrigger();refresh();render();});
         dropdown.appendChild(opt);
       });
-      // Divider + Open Queue
+      // Divider + 6v6
       const div=document.createElement("div"); div.className="cs-divider"; dropdown.appendChild(div);
       ROLES.filter(r=>r.group==="mode").forEach(role=>{
         const opt=document.createElement("div");
@@ -1047,6 +1220,7 @@
     if($("stream").checked)opts.push("Stream");
     if($("offline").checked)opts.push("Offline Mode");
     if($("vpn").checked)opts.push("VPN");
+    if($("rankPs").checked)opts.push("PlayStation +50%");
     const text=["🎮 Overwatch Boost Order","─────────────────────",
       `From:    ${RANKS[fromIdx].label} (${pctFrom}%)`,
       `To:      ${RANKS[toIdx].label} (${pctTo}%)`,
@@ -1104,8 +1278,53 @@
   }
   ["duoBoost","stream","offline","vpn"].forEach(addToggleBounce);
 
+  // Rank Map — drag segment to move whole range
+  (function() {
+    const track = $("progressTrack");
+    let dragSeg = false, segStartX = 0, segStartFrom = 0, segStartTo = 0;
+    track.addEventListener("mousedown", e => {
+      const fp = idxToPct(fromIdx) / 100, tp = idxToPct(toIdx) / 100;
+      const r = track.getBoundingClientRect();
+      const pos = (e.clientX - r.left) / r.width;
+      if (pos > fp + 0.02 && pos < tp - 0.02) {
+        dragSeg = true; segStartX = e.clientX;
+        segStartFrom = fromIdx; segStartTo = toIdx; e.preventDefault();
+      }
+    });
+    document.addEventListener("mousemove", e => {
+      if (!dragSeg) return;
+      const r = track.getBoundingClientRect();
+      const delta = Math.round(((e.clientX - segStartX) / r.width) * (TOTAL - 1));
+      let nf = segStartFrom + delta, nt = segStartTo + delta;
+      if (nf < 0) { nt -= nf; nf = 0; }
+      if (nt > TOTAL - 1) { nf -= nt - (TOTAL - 1); nt = TOTAL - 1; }
+      fromIdx = Math.max(0, nf); toIdx = Math.min(TOTAL - 1, nt); render();
+    });
+    document.addEventListener("mouseup", () => { dragSeg = false; });
+    track.addEventListener("touchstart", e => {
+      const fp = idxToPct(fromIdx) / 100, tp = idxToPct(toIdx) / 100;
+      const r = track.getBoundingClientRect();
+      const pos = (e.touches[0].clientX - r.left) / r.width;
+      if (pos > fp + 0.02 && pos < tp - 0.02) {
+        dragSeg = true; segStartX = e.touches[0].clientX;
+        segStartFrom = fromIdx; segStartTo = toIdx; e.preventDefault();
+      }
+    }, {passive:false});
+    document.addEventListener("touchmove", e => {
+      if (!dragSeg) return;
+      const r = track.getBoundingClientRect();
+      const delta = Math.round(((e.touches[0].clientX - segStartX) / r.width) * (TOTAL - 1));
+      let nf = segStartFrom + delta, nt = segStartTo + delta;
+      if (nf < 0) { nt -= nf; nf = 0; }
+      if (nt > TOTAL - 1) { nf -= nt - (TOTAL - 1); nt = TOTAL - 1; }
+      fromIdx = Math.max(0, nf); toIdx = Math.min(TOTAL - 1, nt); render();
+    }, {passive:true});
+    document.addEventListener("touchend", () => { dragSeg = false; });
+  })();
+
   $("duoBoost").addEventListener("change",()=>{isDuo=$("duoBoost").checked;csRole.refreshTrigger();csRole.refresh();render();});
   $("stream").addEventListener("change",render);
+  $("rankPs").addEventListener("change",render);
   $("copyBtn").addEventListener("click",copyOrder);
   $("orderBtn").addEventListener("click", () => {
     window.open("https://discord.gg/aP6vKM5e", "_blank");
@@ -1229,6 +1448,8 @@
     const wins = plMethod === "pilot" ? plGames * 0.7 : plGames * 0.7;
     let total = pricePerWin * wins;
     if (plMethod === "duo") total *= 1.70;
+    if ($("plStream").checked) total *= 1.05;
+    if ($("plPs").checked) total *= 1.50;
     const role = ROLES.find(r => r.value === plRole);
     if (role) total *= plMethod === "duo" ? role.duo : role.solo;
 
@@ -1259,14 +1480,31 @@
   }
 
   // Win buttons
-  document.querySelectorAll(".win-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".win-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      plGames = +btn.dataset.wins;
-      renderPl();
-    });
-  });
+  // Single range slider for placements games (1-10)
+  (function() {
+    const track = $("plGamesTrack"), fill = $("plGamesFill"), thumb = $("plGamesThumb");
+    let dragging = false;
+    function update(v, silent) {
+      plGames = Math.max(1, Math.min(10, Math.round(v)));
+      const pct = (plGames - 1) / 9 * 100;
+      fill.style.width = pct + "%";
+      thumb.style.left = pct + "%";
+      $("plGamesVal").textContent = plGames + (plGames === 1 ? " game" : " games");
+      if (!silent) renderPl();
+    }
+    function fromCX(cx) {
+      const r = track.getBoundingClientRect();
+      return 1 + ((cx - r.left) / r.width) * 9;
+    }
+    track.addEventListener("click", e => update(fromCX(e.clientX)));
+    thumb.addEventListener("mousedown", e => { dragging = true; thumb.classList.add("dragging"); e.preventDefault(); });
+    document.addEventListener("mousemove", e => { if (dragging) update(fromCX(e.clientX)); });
+    document.addEventListener("mouseup", () => { if (dragging) { dragging = false; thumb.classList.remove("dragging"); } });
+    thumb.addEventListener("touchstart", e => { dragging = true; thumb.classList.add("dragging"); e.preventDefault(); }, {passive:false});
+    document.addEventListener("touchmove", e => { if (dragging) update(fromCX(e.touches[0].clientX)); }, {passive:true});
+    document.addEventListener("touchend", () => { if (dragging) { dragging = false; thumb.classList.remove("dragging"); } });
+    update(5, true);
+  })();
 
   // Mode switcher
   function switchMode(mode) {
@@ -1306,7 +1544,395 @@
 
   buildPlTierSelect();
   buildPlRoleSelect();
+  ["plStream","plPs","plOffline","plVpn"].forEach(id => {
+    const el = $(id); if(el) el.addEventListener("change", renderPl);
+  });
   renderPl();
+
+  // ── BATTLE PASS ──────────────────────────────────────────────────────────
+  // Geometric curve: level 1 = $0.20, level 200 = $2.00
+  // price(n) = 0.20 * r^(n-1), r = (2.0/0.2)^(1/199)
+  const BP_R = Math.pow(2.0/0.20, 1/199);
+  const BP_BASE = 0.20;
+
+  function bpLevelPrice(n) {
+    return BP_BASE * Math.pow(BP_R, n - 1);
+  }
+  function bpRangePrice(from, to) {
+    // sum of levels from..to-1 (cost to go from level `from` to `to`)
+    let total = 0;
+    for (let i = from; i < to; i++) total += bpLevelPrice(i);
+    return total;
+  }
+
+  let bpRole = "any";
+  let bpPreferredRole = "tank";
+
+  function setBpRole(r) {
+    bpRole = r;
+    $("bpRoleAny").classList.toggle("active", r === "any");
+    $("bpRoleLock").classList.toggle("active", r === "lock");
+    $("bpRoleLockField").style.display = r === "lock" ? "block" : "none";
+    renderBp();
+  }
+
+  function buildBpRoleSelect() {
+    const container = $("csBpRole");
+    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
+    const trigger = document.createElement("div"); trigger.className = "cs-trigger";
+    const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
+    const roleLabels = {tank:"Tank", dd:"DD", support:"Support"};
+    function refreshT() { trigger.innerHTML = `<span class="cs-label">${roleLabels[bpPreferredRole]}</span>${ARROW}`; }
+    Object.entries(roleLabels).forEach(([val, label]) => {
+      const opt = document.createElement("div");
+      opt.className = "cs-option" + (val === bpPreferredRole ? " selected" : "");
+      opt.textContent = label;
+      opt.addEventListener("click", () => {
+        bpPreferredRole = val;
+        dropdown.querySelectorAll(".cs-option").forEach(o => o.classList.toggle("selected", o.textContent === label));
+        container.classList.remove("open"); refreshT(); renderBp();
+      });
+      dropdown.appendChild(opt);
+    });
+    trigger.addEventListener("click", e => {
+      e.stopPropagation();
+      const was = container.classList.contains("open");
+      document.querySelectorAll(".custom-select.open").forEach(el => el.classList.remove("open"));
+      if (!was) container.classList.add("open");
+    });
+    refreshT(); container.appendChild(trigger); container.appendChild(dropdown);
+  }
+
+  function renderBp() {
+    const from = Math.max(1, Math.min(199, parseInt($("bpFrom").value) || 1));
+    const to   = Math.max(from + 1, Math.min(200, parseInt($("bpTo").value) || 200));
+    let total = bpRangePrice(from, to);
+    if (bpRole === "lock") total *= 1.10;
+    if ($("bpStream").checked) total *= 1.05;
+    if ($("bpPs").checked) total *= 1.50;
+    const out = $("bpOutput");
+    out.textContent = "$" + total.toFixed(2);
+    out.className = "price-val";
+    $("bpBadge").textContent = `Levels ${from} → ${to} (${to - from} levels)`;
+    $("bpBadge").classList.add("active");
+    $("bpOriginal").textContent = "";
+  }
+
+  // BP dual range slider (1-200) — push behavior like Rank Map
+  (function() {
+    const track = $("bpTrack"), fill = $("bpFill");
+    const thumbF = $("bpThumbFrom"), thumbT = $("bpThumbTo");
+    let dragF = false, dragT = false;
+    let bpFromV = 1, bpToV = 100;
+    function paint() {
+      const fp = (bpFromV - 1) / 199 * 100, tp = (bpToV - 1) / 199 * 100;
+      fill.style.left = fp + "%"; fill.style.width = (tp - fp) + "%";
+      fill.style.background = "var(--hero)";
+      thumbF.style.left = fp + "%"; thumbT.style.left = tp + "%";
+      $("bpFrom").value = bpFromV; $("bpTo").value = bpToV;
+      $("bpRangeVal").textContent = bpFromV + " → " + bpToV;
+      renderBp();
+    }
+    function fromCX(cx) {
+      const r = track.getBoundingClientRect();
+      return Math.round(1 + ((cx - r.left) / r.width) * 199);
+    }
+    function moveFrom(raw) {
+      const nf = Math.max(1, Math.min(199, raw));
+      if (nf >= bpToV) bpToV = Math.min(200, nf + 1);
+      bpFromV = nf; paint();
+    }
+    function moveTo(raw) {
+      const nt = Math.max(2, Math.min(200, raw));
+      if (nt <= bpFromV) bpFromV = Math.max(1, nt - 1);
+      bpToV = nt; paint();
+    }
+    thumbF.addEventListener("mousedown", e => { dragF = true; thumbF.classList.add("dragging"); e.preventDefault(); });
+    thumbT.addEventListener("mousedown", e => { dragT = true; thumbT.classList.add("dragging"); e.preventDefault(); });
+    document.addEventListener("mousemove", e => {
+      if (dragF) moveFrom(fromCX(e.clientX));
+      if (dragT) moveTo(fromCX(e.clientX));
+    });
+    document.addEventListener("mouseup", () => {
+      if (dragF) { dragF = false; thumbF.classList.remove("dragging"); }
+      if (dragT) { dragT = false; thumbT.classList.remove("dragging"); }
+    });
+    thumbF.addEventListener("touchstart", e => { dragF = true; thumbF.classList.add("dragging"); e.preventDefault(); }, {passive:false});
+    thumbT.addEventListener("touchstart", e => { dragT = true; thumbT.classList.add("dragging"); e.preventDefault(); }, {passive:false});
+    document.addEventListener("touchmove", e => {
+      const cx = e.touches[0].clientX;
+      if (dragF) moveFrom(fromCX(cx));
+      if (dragT) moveTo(fromCX(cx));
+    }, {passive:true});
+    document.addEventListener("touchend", () => {
+      dragF = false; dragT = false;
+      thumbF.classList.remove("dragging"); thumbT.classList.remove("dragging");
+    });
+    $("bpFrom").addEventListener("input", () => { moveFrom(parseInt($("bpFrom").value)||1); });
+    $("bpTo").addEventListener("input", () => { moveTo(parseInt($("bpTo").value)||200); });
+
+    // Drag segment (middle area) to move whole range
+    let dragSeg = false, segStartX = 0, segStartFrom = 1, segStartTo = 100;
+    track.addEventListener("mousedown", e => {
+      const fp = (bpFromV - 1) / 199, tp = (bpToV - 1) / 199;
+      const r = track.getBoundingClientRect();
+      const pos = (e.clientX - r.left) / r.width;
+      if (pos > fp + 0.02 && pos < tp - 0.02) {
+        dragSeg = true; segStartX = e.clientX;
+        segStartFrom = bpFromV; segStartTo = bpToV;
+        e.preventDefault();
+      }
+    });
+    document.addEventListener("mousemove", e => {
+      if (!dragSeg) return;
+      const r = track.getBoundingClientRect();
+      const delta = Math.round(((e.clientX - segStartX) / r.width) * 199);
+      let nf = segStartFrom + delta, nt = segStartTo + delta;
+      if (nf < 1) { nt += 1 - nf; nf = 1; }
+      if (nt > 200) { nf -= nt - 200; nt = 200; }
+      bpFromV = Math.max(1, nf); bpToV = Math.min(200, nt); paint();
+    });
+    document.addEventListener("mouseup", () => { dragSeg = false; });
+    track.addEventListener("touchstart", e => {
+      const fp = (bpFromV - 1) / 199, tp = (bpToV - 1) / 199;
+      const r = track.getBoundingClientRect();
+      const pos = (e.touches[0].clientX - r.left) / r.width;
+      if (pos > fp + 0.02 && pos < tp - 0.02) {
+        dragSeg = true; segStartX = e.touches[0].clientX;
+        segStartFrom = bpFromV; segStartTo = bpToV; e.preventDefault();
+      }
+    }, {passive:false});
+    document.addEventListener("touchmove", e => {
+      if (!dragSeg) return;
+      const r = track.getBoundingClientRect();
+      const delta = Math.round(((e.touches[0].clientX - segStartX) / r.width) * 199);
+      let nf = segStartFrom + delta, nt = segStartTo + delta;
+      if (nf < 1) { nt += 1 - nf; nf = 1; }
+      if (nt > 200) { nf -= nt - 200; nt = 200; }
+      bpFromV = Math.max(1, nf); bpToV = Math.min(200, nt); paint();
+    }, {passive:true});
+    document.addEventListener("touchend", () => { dragSeg = false; });
+
+    paint();
+  })();
+  ["bpStream","bpPs","bpOffline","bpVpn"].forEach(id => { const el=$(id); if(el) el.addEventListener("change", renderBp); });
+
+  $("bpCopyBtn").addEventListener("click", () => {
+    const price = $("bpOutput").textContent;
+    const from = $("bpFrom").value, to = $("bpTo").value;
+    const opts = [];
+    if (bpRole === "lock") opts.push(`Role Lock: ${bpPreferredRole}`);
+    if ($("bpStream").checked) opts.push("Stream");
+    if ($("bpPs").checked) opts.push("PlayStation +50%");
+    if ($("bpOffline").checked) opts.push("Offline Mode");
+    if ($("bpVpn").checked) opts.push("VPN");
+    const text = ["⚡ Overwatch Battle Pass Boost","─────────────────────",
+      `Levels: ${from} → ${to} (${to - from} levels)`,
+      opts.length ? `Options: ${opts.join(", ")}` : null,
+      "─────────────────────", `Total: ${price}`
+    ].filter(Boolean).join("\n");
+    const btn = $("bpCopyBtn");
+    const CK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const IC = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+    function showCopied(){btn.classList.add("copied");btn.innerHTML=CK+" Copied!";setTimeout(()=>{btn.classList.remove("copied");btn.innerHTML=IC+" Copy";},2000);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(showCopied).catch(()=>fallbackCopy(text,showCopied));}
+    else fallbackCopy(text,showCopied);
+  });
+
+  buildBpRoleSelect();
+  renderBp();
+
+  // ── COMPETITIVE DRIVES ────────────────────────────────────────────────────
+  const DRIVE_PRICE = {
+    bronze: 10, silver: 15, gold: 20, platinum: 25,
+    diamond: 30, master: 60, grandmaster: 200
+  };
+
+  let drTier = "gold";
+
+  function buildDrTierSelect() {
+    const container = $("csDrTier");
+    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
+    const trigger = document.createElement("div"); trigger.className = "cs-trigger";
+    const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
+    function getLabel(tier) {
+      const m = TIER_META[tier];
+      return `<span class="rank-icon" style="width:20px;height:20px;background:${m.bg};color:${m.color};font-size:9px">${m.symbol}</span> <span class="cs-label">${m.label} — $${DRIVE_PRICE[tier]}/drive</span>`;
+    }
+    trigger.innerHTML = getLabel(drTier) + ARROW;
+    TIERS.forEach(tier => {
+      const opt = document.createElement("div");
+      opt.className = "cs-option" + (tier === drTier ? " selected" : "");
+      opt.dataset.tier = tier;
+      const m = TIER_META[tier];
+      opt.innerHTML = `<span class="rank-icon" style="width:18px;height:18px;background:${m.bg};color:${m.color};font-size:8px">${m.symbol}</span> ${m.label} — $${DRIVE_PRICE[tier]}`;
+      opt.addEventListener("click", () => {
+        drTier = tier;
+        trigger.innerHTML = getLabel(drTier) + ARROW;
+        dropdown.querySelectorAll(".cs-option").forEach(o => o.classList.toggle("selected", o.dataset.tier === tier));
+        container.classList.remove("open");
+        renderDr();
+      });
+      dropdown.appendChild(opt);
+    });
+    trigger.addEventListener("click", e => {
+      e.stopPropagation();
+      const was = container.classList.contains("open");
+      document.querySelectorAll(".custom-select.open").forEach(el => el.classList.remove("open"));
+      if (!was) container.classList.add("open");
+    });
+    container.appendChild(trigger); container.appendChild(dropdown);
+  }
+
+  function renderDr() {
+    const from = Math.max(0, Math.min(3999, parseInt($("drFrom").value) || 0));
+    const to   = Math.max(from + 1, Math.min(4000, parseInt($("drTo").value) || 4000));
+    const range = to - from;
+    const pricePerPoint = DRIVE_PRICE[drTier] / 4000;
+    let total = pricePerPoint * range;
+    if ($("drPs").checked) total *= 1.50;
+    $("drRangeLabel").textContent = `${range} points (${Math.round(range/4000*100)}% of full drive)`;
+    const out = $("drOutput");
+    out.textContent = "$" + total.toFixed(2);
+    out.className = "price-val";
+    $("drBadge").textContent = `$${(pricePerPoint).toFixed(4)}/pt`;
+    $("drBadge").classList.add("active");
+    $("drOriginal").textContent = "";
+  }
+
+  // Drives dual range slider (0-4000) — push behavior like Rank Map
+  (function() {
+    const track = $("drTrack"), fill = $("drFill");
+    const thumbF = $("drThumbFrom"), thumbT = $("drThumbTo");
+    let dragF = false, dragT = false;
+    let drFromV = 0, drToV = 4000;
+    function paint() {
+      const fp = drFromV / 4000 * 100, tp = drToV / 4000 * 100;
+      fill.style.left = fp + "%"; fill.style.width = (tp - fp) + "%";
+      fill.style.background = "var(--hero)";
+      thumbF.style.left = fp + "%"; thumbT.style.left = tp + "%";
+      $("drFrom").value = drFromV; $("drTo").value = drToV;
+      $("drRangeVal").textContent = (drToV - drFromV) + " pts";
+      renderDr();
+    }
+    function fromCX(cx) {
+      const r = track.getBoundingClientRect();
+      return Math.round(Math.max(0, Math.min(4000, ((cx - r.left) / r.width) * 4000)));
+    }
+    function moveFrom(raw) {
+      const nf = Math.max(0, Math.min(3999, raw));
+      if (nf >= drToV) drToV = Math.min(4000, nf + 1);
+      drFromV = nf; paint();
+    }
+    function moveTo(raw) {
+      const nt = Math.max(1, Math.min(4000, raw));
+      if (nt <= drFromV) drFromV = Math.max(0, nt - 1);
+      drToV = nt; paint();
+    }
+    thumbF.addEventListener("mousedown", e => { dragF = true; thumbF.classList.add("dragging"); e.preventDefault(); });
+    thumbT.addEventListener("mousedown", e => { dragT = true; thumbT.classList.add("dragging"); e.preventDefault(); });
+    document.addEventListener("mousemove", e => {
+      if (dragF) moveFrom(fromCX(e.clientX));
+      if (dragT) moveTo(fromCX(e.clientX));
+    });
+    document.addEventListener("mouseup", () => {
+      if (dragF) { dragF = false; thumbF.classList.remove("dragging"); }
+      if (dragT) { dragT = false; thumbT.classList.remove("dragging"); }
+    });
+    thumbF.addEventListener("touchstart", e => { dragF = true; thumbF.classList.add("dragging"); e.preventDefault(); }, {passive:false});
+    thumbT.addEventListener("touchstart", e => { dragT = true; thumbT.classList.add("dragging"); e.preventDefault(); }, {passive:false});
+    document.addEventListener("touchmove", e => {
+      const cx = e.touches[0].clientX;
+      if (dragF) moveFrom(fromCX(cx));
+      if (dragT) moveTo(fromCX(cx));
+    }, {passive:true});
+    document.addEventListener("touchend", () => {
+      dragF = false; dragT = false;
+      thumbF.classList.remove("dragging"); thumbT.classList.remove("dragging");
+    });
+    $("drFrom").addEventListener("input", () => { moveFrom(parseInt($("drFrom").value)||0); });
+    $("drTo").addEventListener("input", () => { moveTo(parseInt($("drTo").value)||4000); });
+
+    // Drag segment to move whole range
+    let dragSeg = false, segStartX = 0, segStartFrom = 0, segStartTo = 4000;
+    track.addEventListener("mousedown", e => {
+      const fp = drFromV / 4000, tp = drToV / 4000;
+      const r = track.getBoundingClientRect();
+      const pos = (e.clientX - r.left) / r.width;
+      if (pos > fp + 0.02 && pos < tp - 0.02) {
+        dragSeg = true; segStartX = e.clientX;
+        segStartFrom = drFromV; segStartTo = drToV; e.preventDefault();
+      }
+    });
+    document.addEventListener("mousemove", e => {
+      if (!dragSeg) return;
+      const r = track.getBoundingClientRect();
+      const delta = Math.round(((e.clientX - segStartX) / r.width) * 4000);
+      let nf = segStartFrom + delta, nt = segStartTo + delta;
+      if (nf < 0) { nt -= nf; nf = 0; }
+      if (nt > 4000) { nf -= nt - 4000; nt = 4000; }
+      drFromV = Math.max(0, nf); drToV = Math.min(4000, nt); paint();
+    });
+    document.addEventListener("mouseup", () => { dragSeg = false; });
+    track.addEventListener("touchstart", e => {
+      const fp = drFromV / 4000, tp = drToV / 4000;
+      const r = track.getBoundingClientRect();
+      const pos = (e.touches[0].clientX - r.left) / r.width;
+      if (pos > fp + 0.02 && pos < tp - 0.02) {
+        dragSeg = true; segStartX = e.touches[0].clientX;
+        segStartFrom = drFromV; segStartTo = drToV; e.preventDefault();
+      }
+    }, {passive:false});
+    document.addEventListener("touchmove", e => {
+      if (!dragSeg) return;
+      const r = track.getBoundingClientRect();
+      const delta = Math.round(((e.touches[0].clientX - segStartX) / r.width) * 4000);
+      let nf = segStartFrom + delta, nt = segStartTo + delta;
+      if (nf < 0) { nt -= nf; nf = 0; }
+      if (nt > 4000) { nf -= nt - 4000; nt = 4000; }
+      drFromV = Math.max(0, nf); drToV = Math.min(4000, nt); paint();
+    }, {passive:true});
+    document.addEventListener("touchend", () => { dragSeg = false; });
+
+    paint();
+  })();
+  ["drPs","drVpn"].forEach(id => { const el=$(id); if(el) el.addEventListener("change", renderDr); });
+
+  $("drCopyBtn").addEventListener("click", () => {
+    const price = $("drOutput").textContent;
+    const from = $("drFrom").value, to = $("drTo").value;
+    const opts = [];
+    if ($("drPs").checked) opts.push("PlayStation +50%");
+    if ($("drVpn").checked) opts.push("VPN");
+    const text = ["🔥 Overwatch Competitive Drives","─────────────────────",
+      `Rank: ${TIER_META[drTier].label}`,
+      `Points: ${from} → ${to} (${to - from} pts)`,
+      opts.length ? `Options: ${opts.join(", ")}` : null,
+      "─────────────────────", `Total: ${price}`
+    ].filter(Boolean).join("\n");
+    const btn = $("drCopyBtn");
+    const CK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const IC = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+    function showCopied(){btn.classList.add("copied");btn.innerHTML=CK+" Copied!";setTimeout(()=>{btn.classList.remove("copied");btn.innerHTML=IC+" Copy";},2000);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(showCopied).catch(()=>fallbackCopy(text,showCopied));}
+    else fallbackCopy(text,showCopied);
+  });
+
+  buildDrTierSelect();
+  renderDr();
+
+  // ── UPDATED switchMode ─────────────────────────────────────────────────────
+  function switchMode(mode) {
+    const panels = {rank:"rankPanel", placement:"placementPanel", battlepass:"bpPanel", drives:"drPanel"};
+    const btns   = {rank:"modeRank", placement:"modePl", battlepass:"modeBp", drives:"modeDr"};
+    const titles = {rank:"Rank Boost", placement:"Placements", battlepass:"Battle Pass", drives:"Drives"};
+    Object.values(panels).forEach(id => { const el=$(id); if(el) el.classList.remove("active"); });
+    Object.values(btns).forEach(id => { const el=$(id); if(el) el.classList.remove("active"); });
+    const panel=$(panels[mode]); if(panel) panel.classList.add("active");
+    const btn=$(btns[mode]); if(btn) btn.classList.add("active");
+    $("bannerMode").textContent = titles[mode] || "Boost";
+  }
+
 </script>
 </body>
 </html>
