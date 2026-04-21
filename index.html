@@ -61,7 +61,7 @@
 
     /* Hero banner */
     .card-banner {
-      padding: 22px 24px 20px;
+      padding: 16px 20px 14px;
       background: linear-gradient(135deg, #1a1f35 0%, #0f1220 100%);
       border-bottom: 1px solid var(--edge);
       position: relative;
@@ -78,7 +78,7 @@
       pointer-events: none;
     }
     .banner-title {
-      font-size: 22px; font-weight: 900;
+      font-size: 20px; font-weight: 900;
       letter-spacing: -0.3px;
       line-height: 1;
       position: relative; z-index: 1;
@@ -91,14 +91,14 @@
       position: relative; z-index: 1;
     }
 
-    .card-body { padding: 20px 20px 24px; }
-    @media (min-width: 540px) { .card-body { padding: 22px 24px 28px; } }
+    .card-body { padding: 16px 16px 20px; }
+@media (min-width: 540px) { .card-body { padding: 20px 22px 24px; } }
 
     /* Section label */
     .sec-label {
       font-size: 10px; font-weight: 800;
       letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--dim); margin-bottom: 8px;
+      color: var(--dim); margin-bottom: 6px;
     }
 
     /* Rank row — two selects side by side */
@@ -107,7 +107,7 @@
       grid-template-columns: 1fr auto 1fr;
       align-items: start;
       gap: 8px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .rank-arrow {
       display: flex; align-items: center; justify-content: center;
@@ -186,7 +186,7 @@
       display: grid;
       grid-template-columns: 1fr 30px 1fr;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
       align-items: center;
     }
     .pct-row-dual .spacer { /* middle gap */ }
@@ -227,17 +227,17 @@
     }
 
     /* Role select */
-    .field { margin-bottom: 18px; }
+    .field { margin-bottom: 14px; }
 
     /* Divider */
-    .hr { height: 1px; background: var(--edge); margin: 4px 0 18px; }
+    .hr { height: 1px; background: var(--edge); margin: 2px 0 14px; }
 
     /* Toggles */
-    .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+    .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 16px; }
 
     .tog {
       display: flex; align-items: center; gap: 9px;
-      padding: 11px 12px;
+      padding: 9px 11px;
       background: var(--bg3); border: 1.5px solid var(--edge);
       border-radius: var(--r); cursor: pointer; user-select: none;
       font-family: 'Nunito', sans-serif;
@@ -279,7 +279,7 @@
     }
 
     /* Progress bar */
-    .prog-wrap { margin-bottom: 20px; }
+    .prog-wrap { margin-bottom: 16px; }
     .prog-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 10px;
@@ -352,7 +352,7 @@
     .price-box {
       background: var(--bg3); border: 1.5px solid var(--edge);
       border-radius: var(--r); padding: 16px 18px 14px;
-      margin-bottom: 12px; position: relative; overflow: hidden;
+      margin-bottom: 10px; position: relative; overflow: hidden;
     }
     .price-box::before {
       content: '';
@@ -368,7 +368,7 @@
     .price-original { font-family: 'Fira Code', monospace; font-size: 13px; color: var(--dim); text-decoration: line-through; height: 18px; line-height: 18px; }
     .price-val {
       font-family: 'Nunito', sans-serif;
-      font-size: 48px; font-weight: 900; color: var(--gold);
+      font-size: 44px; font-weight: 900; color: var(--gold);
       letter-spacing: -1px; line-height: 1;
       margin-bottom: 8px;
     }
@@ -736,7 +736,7 @@
 
         <div class="hr"></div>
 
-        <div class="toggles" style="margin-bottom:20px">
+        <div class="toggles" style="margin-bottom:14px">
           <label class="tog"><input type="checkbox" id="plStream"><span class="tog-switch"></span>Stream<span class="tog-tag">+5%</span></label>
           <label class="tog" style=""><input type="checkbox" id="plPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
           <label class="tog free"><input type="checkbox" id="plOffline"><span class="tog-switch"></span>Offline<span class="tog-tag">Free</span></label>
@@ -814,7 +814,7 @@
 
         <div class="hr"></div>
 
-        <div class="toggles" style="margin-bottom:20px">
+        <div class="toggles" style="margin-bottom:14px">
           <label class="tog"><input type="checkbox" id="bpStream"><span class="tog-switch"></span>Stream<span class="tog-tag">+5%</span></label>
           <label class="tog"><input type="checkbox" id="bpPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
           <label class="tog free"><input type="checkbox" id="bpOffline"><span class="tog-switch"></span>Offline<span class="tog-tag">Free</span></label>
@@ -866,7 +866,7 @@
 
         <div class="hr"></div>
 
-        <div class="toggles" style="margin-bottom:20px">
+        <div class="toggles" style="margin-bottom:14px">
           <label class="tog"><input type="checkbox" id="drPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
           <label class="tog free"><input type="checkbox" id="drVpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
         </div>
@@ -1552,7 +1552,7 @@
   // ── BATTLE PASS ──────────────────────────────────────────────────────────
   // Geometric curve: level 1 = $0.20, level 200 = $2.00
   // price(n) = 0.20 * r^(n-1), r = (2.0/0.2)^(1/199)
-  const BP_R = Math.pow(2.0/0.20, 1/199);
+  const BP_R = Math.pow(1.5/0.20, 1/199);
   const BP_BASE = 0.20;
 
   function bpLevelPrice(n) {
@@ -1603,19 +1603,38 @@
     refreshT(); container.appendChild(trigger); container.appendChild(dropdown);
   }
 
+  function bpRangePriceDiscounted(from, to) {
+    let total = 0;
+    for (let i = from; i < to; i++) {
+      let p = bpLevelPrice(i);
+      if (i >= 100) p *= 0.85; // 15% off from level 100
+      total += p;
+    }
+    return total;
+  }
+
   function renderBp() {
     const from = Math.max(1, Math.min(199, parseInt($("bpFrom").value) || 1));
     const to   = Math.max(from + 1, Math.min(200, parseInt($("bpTo").value) || 200));
-    let total = bpRangePrice(from, to);
+    const base = bpRangePrice(from, to);
+    let total  = bpRangePriceDiscounted(from, to);
     if (bpRole === "lock") total *= 1.10;
     if ($("bpStream").checked) total *= 1.05;
     if ($("bpPs").checked) total *= 1.50;
     const out = $("bpOutput");
     out.textContent = "$" + total.toFixed(2);
     out.className = "price-val";
-    $("bpBadge").textContent = `Levels ${from} → ${to} (${to - from} levels)`;
-    $("bpBadge").classList.add("active");
-    $("bpOriginal").textContent = "";
+    const hasDiscount = from < 100 && to > 100;
+    const badge = $("bpBadge");
+    if (hasDiscount) {
+      $("bpOriginal").textContent = "$" + (bpRangePrice(from, to) * (bpRole==="lock"?1.10:1) * ($("bpStream").checked?1.05:1) * ($("bpPs").checked?1.50:1)).toFixed(2);
+      badge.textContent = "15% off levels 100+";
+      badge.classList.add("active");
+    } else {
+      $("bpOriginal").textContent = "";
+      badge.textContent = `Levels ${from} → ${to}`;
+      badge.classList.add("active");
+    }
   }
 
   // BP dual range slider (1-200) — push behavior like Rank Map
@@ -1757,7 +1776,7 @@
     const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
     function getLabel(tier) {
       const m = TIER_META[tier];
-      return `<span class="rank-icon" style="width:20px;height:20px;background:${m.bg};color:${m.color};font-size:9px">${m.symbol}</span> <span class="cs-label">${m.label} — $${DRIVE_PRICE[tier]}/drive</span>`;
+      return `<span class="rank-icon" style="width:20px;height:20px;background:${m.bg};color:${m.color};font-size:9px">${m.symbol}</span> <span class="cs-label">${m.label} — $${DRIVE_PRICE[tier]}</span>`;
     }
     trigger.innerHTML = getLabel(drTier) + ARROW;
     TIERS.forEach(tier => {
@@ -1795,7 +1814,7 @@
     const out = $("drOutput");
     out.textContent = "$" + total.toFixed(2);
     out.className = "price-val";
-    $("drBadge").textContent = `$${(pricePerPoint).toFixed(4)}/pt`;
+    $("drBadge").textContent = `$${(pricePerPoint).toFixed(3)}/pt · ${TIER_META[drTier].label}`;
     $("drBadge").classList.add("active");
     $("drOriginal").textContent = "";
   }
