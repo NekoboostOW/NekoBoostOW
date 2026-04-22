@@ -7,572 +7,194 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:      #0f111a;
-      --bg2:     #171a26;
-      --bg3:     #1e2235;
-      --edge:    #2a2f47;
-      --edge2:   #353c5e;
-      --dim:     #5a6390;
-      --mist:    #8892c0;
-      --snow:    #eef0ff;
-      --hero:    #6c8fff;  /* OW blue */
-      --hero2:   #4f6fe0;
-      --gold:    #ffcc44;
-      --gold2:   #e8b020;
-      --teal:    #30d5c8;
-      --green:   #44d98e;
-      --red:     #ff6b6b;
-      --r: 10px;
+      --bg:#0f111a; --bg2:#171a26; --bg3:#1e2235;
+      --edge:#2a2f47; --edge2:#353c5e; --dim:#5a6390; --mist:#8892c0;
+      --snow:#eef0ff; --hero:#6c8fff; --hero2:#4f6fe0; --gold:#ffcc44;
+      --teal:#30d5c8; --green:#44d98e; --red:#ff6b6b; --r:10px;
     }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { height: 100%; }
-
-    body {
-      min-height: 100%;
-      font-family: 'Nunito', sans-serif;
-      background: var(--bg);
-      color: var(--snow);
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 20px 14px 48px;
-    }
-    @media (min-width: 540px) { body { align-items: center; padding: 32px 16px; } }
-
-    /* Subtle bg blobs */
-    .bg-blob {
-      position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
-      filter: blur(80px); opacity: 0.18;
-    }
-    .bg-blob-1 { width: 380px; height: 280px; background: var(--hero); top: -80px; right: -80px; }
-    .bg-blob-2 { width: 300px; height: 200px; background: var(--teal); bottom: -60px; left: -60px; }
-
-    .card {
-      position: relative; z-index: 1;
-      width: 100%; max-width: 500px;
-      background: var(--bg2);
-      border: 1px solid var(--edge);
-      border-radius: 20px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-    @media (min-width: 540px) { .card { margin-top: 0; } }
-
-    /* Hero banner */
-    .card-banner {
-      padding: 16px 20px 14px;
-      background: linear-gradient(135deg, #1a1f35 0%, #0f1220 100%);
-      border-bottom: 1px solid var(--edge);
-      position: relative;
-      overflow: hidden;
-    }
-    .card-banner::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg,
-        rgba(108,143,255,0.08) 0%,
-        rgba(48,213,200,0.05) 100%
-      );
-      pointer-events: none;
-    }
-    .banner-title {
-      font-size: 20px; font-weight: 900;
-      letter-spacing: -0.3px;
-      line-height: 1;
-      position: relative; z-index: 1;
-    }
-    .banner-title span { color: var(--hero); }
-    .banner-sub {
-      font-size: 12px; font-weight: 600;
-      color: var(--dim); margin-top: 4px;
-      letter-spacing: 0.3px;
-      position: relative; z-index: 1;
-    }
-
-    .card-body { padding: 16px 16px 20px; }
-@media (min-width: 540px) { .card-body { padding: 20px 22px 24px; } }
-
-    /* Section label */
-    .sec-label {
-      font-size: 10px; font-weight: 800;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--dim); margin-bottom: 6px;
-    }
-
-    /* Rank row — two selects side by side */
-    .rank-row {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: start;
-      gap: 8px;
-      margin-bottom: 2px;
-    }
-    .rank-arrow {
-      display: flex; align-items: center; justify-content: center;
-      color: var(--dim); flex-shrink: 0;
-      font-size: 18px;
-      padding-top: 20px; /* offset for rank-col-label above trigger */
-    }
-    .rank-col { display: flex; flex-direction: column; }
-    .rank-col-label {
-      font-size: 9px; font-weight: 800; letter-spacing: 1.5px;
-      text-transform: uppercase; color: var(--dim);
-      margin-bottom: 5px;
-    }
-
-    /* Custom select */
-    .custom-select { position: relative; user-select: none; }
-    .cs-trigger {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 10px;
-      background: var(--bg3);
-      border: 1.5px solid var(--edge);
-      border-radius: var(--r);
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      font-size: 13px; font-weight: 700;
-      font-family: 'Nunito', sans-serif;
-      color: var(--snow);
-    }
-    .cs-trigger:hover { border-color: var(--edge2); }
-    .custom-select.open .cs-trigger { border-color: var(--hero); background: #1e2540; }
-    .cs-label { flex: 1; font-size: 12px; }
-    .cs-arrow { transition: transform 0.2s; color: var(--dim); flex-shrink: 0; }
-    .custom-select.open .cs-arrow { transform: rotate(180deg); color: var(--hero); }
-
-    .cs-dropdown {
-      display: none;
-      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-      background: var(--bg3);
-      border: 1.5px solid var(--edge2);
-      border-radius: var(--r);
-      z-index: 200;
-      max-height: 260px; overflow-y: auto;
-      scrollbar-width: thin; scrollbar-color: var(--edge) transparent;
-      box-shadow: 0 20px 48px rgba(0,0,0,0.6);
-    }
-    .custom-select.open .cs-dropdown { display: block; }
-
-    .cs-option {
-      display: flex; align-items: center; gap: 8px;
-      padding: 9px 12px; cursor: pointer;
-      font-size: 12px; font-weight: 700;
-      font-family: 'Nunito', sans-serif;
-      color: var(--mist);
-      transition: background 0.1s, color 0.1s;
-    }
-    .cs-option:hover { background: rgba(108,143,255,0.08); color: var(--snow); }
-    .cs-option.selected { color: var(--hero); }
-
-    .cs-group-header {
-      padding: 7px 12px 3px;
-      font-size: 9px; font-weight: 800; letter-spacing: 1.5px;
-      text-transform: uppercase; color: var(--dim);
-      border-top: 1px solid var(--edge);
-    }
-    .cs-group-header:first-child { border-top: none; }
-    .cs-divider { height: 1px; background: var(--edge); margin: 4px 0; }
-
-    .rank-icon {
-      width: 20px; height: 20px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 9px; font-weight: 800; flex-shrink: 0;
-    }
-
-    /* Pct sliders under rank row */
-    .pct-row-dual {
-      display: grid;
-      grid-template-columns: 1fr 30px 1fr;
-      gap: 8px;
-      margin-bottom: 14px;
-      align-items: center;
-    }
-    .pct-row-dual .spacer { /* middle gap */ }
-
-    .pct-block { display: flex; flex-direction: column; gap: 0; }
-
-    .pct-track-wrap {
-      display: flex; align-items: center; gap: 8px;
-    }
-    .pct-track {
-      flex: 1; position: relative;
-      height: 6px; border-radius: 99px;
-      background: var(--bg3);
-      border: 1px solid var(--edge);
-      cursor: pointer;
-    }
-    .pct-fill {
-      position: absolute; top: 0; left: 0; height: 100%;
-      border-radius: 99px; pointer-events: none;
-    }
-    .pct-thumb {
-      position: absolute; top: 50%;
-      transform: translate(-50%, -50%);
-      width: 24px; height: 24px; border-radius: 50%;
-      background: var(--hero);
-      border: 3px solid var(--bg2);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      cursor: grab; z-index: 2; touch-action: none;
-      transition: transform 0.1s, box-shadow 0.1s;
-    }
-    .pct-thumb:hover { transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 0 0 6px rgba(108,143,255,0.2); }
-    .pct-thumb.dragging { cursor: grabbing; transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 0 0 8px rgba(108,143,255,0.15); transition: none; }
-    .pct-val {
-      font-family: 'Fira Code', monospace;
-      font-size: 11px; font-weight: 500;
-      min-width: 30px; text-align: right; color: var(--dim);
-      flex-shrink: 0;
-    }
-
-    /* Role select */
-    .field { margin-bottom: 14px; }
-
-    /* Divider */
-    .hr { height: 1px; background: var(--edge); margin: 2px 0 14px; }
-
-    /* Toggles */
-    .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 16px; }
-
-    .tog {
-      display: flex; align-items: center; gap: 9px;
-      padding: 9px 11px;
-      background: var(--bg3); border: 1.5px solid var(--edge);
-      border-radius: var(--r); cursor: pointer; user-select: none;
-      font-family: 'Nunito', sans-serif;
-      font-size: 12px; font-weight: 700; color: var(--mist);
-      transition: border-color 0.15s, background 0.15s, color 0.15s;
-    }
-    .tog input { display: none; }
-
-    .tog-switch {
-      width: 32px; height: 18px; border-radius: 99px;
-      background: var(--edge2); position: relative; flex-shrink: 0;
-      transition: background 0.2s;
-    }
-    .tog-switch::after {
-      content: ''; position: absolute;
-      top: 3px; left: 3px; width: 12px; height: 12px;
-      border-radius: 50%; background: var(--dim);
-      transition: transform 0.2s, background 0.2s;
-    }
-    .tog input:checked ~ .tog-switch { background: rgba(108,143,255,0.3); }
-    .tog input:checked ~ .tog-switch::after { transform: translateX(14px); background: var(--hero); }
-    .tog:has(input:checked) { border-color: rgba(108,143,255,0.4); background: rgba(108,143,255,0.06); color: var(--snow); }
-
-    .tog.free input:checked ~ .tog-switch { background: rgba(68,217,142,0.25); }
-    .tog.free input:checked ~ .tog-switch::after { background: var(--green); }
-    .tog.free:has(input:checked) { border-color: rgba(68,217,142,0.35); background: rgba(68,217,142,0.05); }
-
-    .tog-tag { font-size: 10px; font-weight: 800; color: var(--dim); }
-    .tog:has(input:checked) .tog-tag { color: var(--hero); }
-    .tog.free:has(input:checked) .tog-tag { color: var(--green); }
-
-    .duo-extra {
-      margin-left: auto;
-      font-size: 10px; font-weight: 800;
-      color: var(--gold);
-      opacity: 0;
-      transform: translateY(4px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    /* Progress bar */
-    .prog-wrap { margin-bottom: 16px; }
-    .prog-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 10px;
-    }
-    .prog-names {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 12px; font-weight: 700;
-    }
-    .prog-from { color: var(--mist); }
-    .prog-arrow { color: var(--dim); font-size: 10px; }
-    .prog-to { color: var(--gold); }
-
-    .progress-track {
-      position: relative; height: 10px;
-      border-radius: 99px; cursor: pointer;
-      overflow: visible;
-    }
-    .progress-bg {
-      position: absolute; inset: 0;
-      background: var(--edge);
-      border-radius: 99px;
-    }
-    .progress-fill {
-      position: absolute; top: 0; height: 100%;
-      border-radius: 99px; pointer-events: none;
-      background: linear-gradient(90deg,
-        #a0522d 0%, #b0b8c8 16.6%, #f0b429 33.2%,
-        #3ecfcf 50%, #4a9eff 66.6%, #3ddc84 83.2%, #f5a623 100%
-      );
-      background-size: 500px 100%;
-    }
-    .progress-tick {
-      position: absolute; top: 0; width: 2px; height: 100%;
-      background: rgba(15,17,26,0.7); pointer-events: none; z-index: 1;
-    }
-    .progress-dot {
-      position: absolute; top: 50%;
-      transform: translate(-50%, -50%);
-      width: 24px; height: 24px; border-radius: 50%;
-      border: 3px solid var(--bg2);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-      cursor: grab; z-index: 3; touch-action: none;
-      transition: box-shadow 0.15s, transform 0.1s;
-    }
-    .progress-dot:hover { transform: translate(-50%,-50%) scale(1.2); box-shadow: 0 0 0 6px rgba(255,255,255,0.1); }
-    .progress-dot.dragging { cursor: grabbing; transform: translate(-50%,-50%) scale(1.25); box-shadow: 0 0 0 8px rgba(255,255,255,0.08); transition: none; }
-
-    .dot-tooltip {
-      position: absolute; bottom: 26px; left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg3); border: 1px solid var(--edge2);
-      color: var(--snow); font-size: 11px; font-weight: 700;
-      white-space: nowrap; padding: 4px 9px; border-radius: 6px;
-      pointer-events: none; opacity: 0; transition: opacity 0.15s;
-      font-family: 'Nunito', sans-serif;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-    }
-    .progress-dot:hover .dot-tooltip,
-    .progress-dot.dragging .dot-tooltip { opacity: 1; }
-
-    .progress-labels { position: relative; height: 18px; margin-top: 8px; }
-    .progress-labels span {
-      position: absolute; transform: translateX(-50%);
-      font-size: 9px; font-weight: 800; letter-spacing: 1px;
-      text-transform: uppercase; opacity: 0.65;
-      font-family: 'Nunito', sans-serif;
-    }
-
-    /* Price box */
-    .price-box {
-      background: var(--bg3); border: 1.5px solid var(--edge);
-      border-radius: var(--r); padding: 16px 18px 14px;
-      margin-bottom: 10px; position: relative; overflow: hidden;
-    }
-    .price-box::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(108,143,255,0.05) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .price-top {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 2px;
-    }
-    .price-meta { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--dim); }
-    .price-original { font-family: 'Fira Code', monospace; font-size: 13px; color: var(--dim); text-decoration: line-through; height: 18px; line-height: 18px; }
-    .price-val {
-      font-family: 'Nunito', sans-serif;
-      font-size: 44px; font-weight: 900; color: var(--gold);
-      letter-spacing: -1px; line-height: 1;
-      margin-bottom: 8px;
-    }
-    .price-val.error { font-size: 14px; font-weight: 700; color: var(--red); letter-spacing: 0; }
-    .price-badge {
-      display: inline-block; height: 22px; line-height: 22px;
-      border-radius: 6px; font-size: 11px; font-weight: 800;
-      letter-spacing: 0.5px; padding: 0 9px;
-      background: transparent; color: transparent;
-      transition: background 0.2s, color 0.2s;
-    }
-    .price-badge.active { background: rgba(68,217,142,0.12); color: var(--green); }
-
-    /* Copy btn */
-    .copy-btn {
-      width: 100%; padding: 13px;
-      background: rgba(108,143,255,0.08);
-      border: 1.5px solid rgba(108,143,255,0.25);
-      border-radius: var(--r); color: var(--hero);
-      font-family: 'Nunito', sans-serif;
-      font-size: 13px; font-weight: 800; letter-spacing: 0.5px;
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .copy-btn:hover { background: rgba(108,143,255,0.14); border-color: var(--hero); }
-    .copy-btn.copied { background: rgba(68,217,142,0.1); border-color: var(--green); color: var(--green); }
-
-    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
-    .order-btn {
-      padding: 13px;
-      background: var(--hero);
-      border: none; border-radius: var(--r);
-      color: #fff;
-      font-family: 'Nunito', sans-serif;
-      font-size: 13px; font-weight: 900; letter-spacing: 0.3px;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-      box-shadow: 0 4px 16px rgba(108,143,255,0.3);
-    }
-    .order-btn:hover {
-      background: #7d9cff;
-      box-shadow: 0 6px 24px rgba(108,143,255,0.45);
-      transform: translateY(-1px);
-    }
-    .order-btn:active { transform: translateY(0); }
-
-    /* Micro: toggle bounce */
-    @keyframes togBounce {
-      0%   { transform: scale(1); }
-      40%  { transform: scale(0.94); }
-      70%  { transform: scale(1.04); }
-      100% { transform: scale(1); }
-    }
-    .tog.bounce { animation: togBounce 0.3s ease; }
-
-    /* Micro: select pulse on change */
-    @keyframes selectPulse {
-      0%   { box-shadow: 0 0 0 0 rgba(108,143,255,0.4); }
-      100% { box-shadow: 0 0 0 6px rgba(108,143,255,0); }
-    }
-    .cs-trigger.pulse { animation: selectPulse 0.4s ease-out; }
-
-    /* Badge glow on discount */
-    @keyframes badgeIn {
-      0%   { opacity: 0; transform: translateY(-4px) scale(0.95); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .price-badge.active { animation: badgeIn 0.25s ease; }
-
-    /* Mode switcher */
-    .mode-switch {
-      display: flex;
-      background: var(--bg3);
-      border: 1.5px solid var(--edge);
-      border-radius: var(--r);
-      padding: 3px;
-      margin-bottom: 20px;
-      gap: 3px;
-    }
-    .mode-btn {
-      flex: 1; padding: 8px;
-      border: none; border-radius: 7px;
-      font-family: 'Nunito', sans-serif;
-      font-size: 12px; font-weight: 800;
-      cursor: pointer; letter-spacing: 0.3px;
-      transition: background 0.2s, color 0.2s;
-      background: transparent; color: var(--dim);
-    }
-    .mode-btn.active {
-      background: var(--hero);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(108,143,255,0.4);
-    }
-
-    /* Placements panel */
-    .pl-panel { display: none; }
-    .pl-panel.active { display: block; }
-
-    /* Win count selector */
-    .win-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin-bottom: 16px;
-    }
-    .win-btn {
-      padding: 10px 0;
-      border: 1.5px solid var(--edge);
-      border-radius: 8px;
-      background: var(--bg3);
-      color: var(--mist);
-      font-family: 'Nunito', sans-serif;
-      font-size: 14px; font-weight: 900;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s, color 0.15s;
-      text-align: center;
-    }
-    .win-btn.active {
-      border-color: var(--hero);
-      background: rgba(108,143,255,0.1);
-      color: var(--snow);
-    }
-
-    /* Boost method selector */
-    .method-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .method-btn {
-      padding: 11px 10px;
-      border: 1.5px solid var(--edge);
-      border-radius: var(--r);
-      background: var(--bg3);
-      color: var(--mist);
-      font-family: 'Nunito', sans-serif;
-      font-size: 12px; font-weight: 800;
-      cursor: pointer;
-      transition: all 0.15s;
-      text-align: center;
-    }
-    .method-btn.active {
-      border-color: var(--hero);
-      background: rgba(108,143,255,0.08);
-      color: var(--snow);
-    }
-    .method-sub {
-      display: block;
-      font-size: 9px; font-weight: 600;
-      color: var(--dim); margin-top: 2px;
-      letter-spacing: 0.5px;
-    }
-    .method-btn.active .method-sub { color: var(--green); }
-
-    /* Unified range slider */
-    .range-wrap { margin-bottom: 16px; }
-    .range-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .range-val { font-family: 'Fira Code', monospace; font-size: 13px; font-weight: 500; color: var(--hero); }
-    .range-input-row { display: flex; align-items: center; gap: 8px; }
-    .range-num-input {
-      width: 64px; padding: 6px 8px;
-      background: var(--bg3); border: 1.5px solid var(--edge);
-      border-radius: 6px; color: var(--snow);
-      font-family: 'Fira Code', monospace; font-size: 12px; font-weight: 500;
-      text-align: center;
-    }
-    .range-num-input:focus { outline: none; border-color: var(--hero); }
-
-    /* Dual range slider track */
-    .dual-range-wrap { position: relative; height: 6px; border-radius: 99px; margin: 10px 0 8px; cursor: pointer; }
-    .dual-range-bg { position: absolute; inset: 0; background: var(--edge); border-radius: 99px; }
-    .dual-range-fill { position: absolute; top: 0; height: 100%; border-radius: 99px; pointer-events: none; }
-    .dual-range-thumb {
-      position: absolute; top: 50%;
-      transform: translate(-50%, -50%);
-      width: 22px; height: 22px; border-radius: 50%;
-      border: 3px solid var(--bg2);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      cursor: grab; z-index: 2; touch-action: none;
-      transition: box-shadow 0.1s;
-    }
-    .dual-range-thumb:hover { box-shadow: 0 0 0 6px rgba(108,143,255,0.2); }
-    .dual-range-thumb.dragging { cursor: grabbing; box-shadow: 0 0 0 8px rgba(108,143,255,0.15); transition: none; }
-    .dual-range-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--dim); font-family: 'Fira Code', monospace; }
-
-    /* Single range */
-    .single-range-wrap { position: relative; height: 6px; border-radius: 99px; margin: 10px 0 8px; cursor: pointer; }
-    .single-range-bg { position: absolute; inset: 0; background: var(--edge); border-radius: 99px; }
-    .single-range-fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 99px; background: var(--hero); pointer-events: none; }
-    .single-range-thumb {
-      position: absolute; top: 50%;
-      transform: translate(-50%, -50%);
-      width: 22px; height: 22px; border-radius: 50%;
-      background: var(--hero);
-      border: 3px solid var(--bg2);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      cursor: grab; z-index: 2; touch-action: none;
-    }
-    .single-range-thumb:hover { box-shadow: 0 0 0 6px rgba(108,143,255,0.2); }
-    .single-range-thumb.dragging { cursor: grabbing; box-shadow: 0 0 0 8px rgba(108,143,255,0.15); transition: none; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{height:100%}
+    body{min-height:100%;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--snow);
+      display:flex;align-items:flex-start;justify-content:center;padding:20px 14px 48px}
+    @media(min-width:540px){body{align-items:center;padding:32px 16px}}
+    .bg-blob{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);opacity:.18}
+    .bg-blob-1{width:380px;height:280px;background:var(--hero);top:-80px;right:-80px}
+    .bg-blob-2{width:300px;height:200px;background:var(--teal);bottom:-60px;left:-60px}
+    .card{position:relative;z-index:1;width:100%;max-width:500px;background:var(--bg2);
+      border:1px solid var(--edge);border-radius:20px;overflow:hidden;margin-top:8px}
+    @media(min-width:540px){.card{margin-top:0}}
+    .card-banner{padding:16px 20px 14px;background:linear-gradient(135deg,#1a1f35 0%,#0f1220 100%);
+      border-bottom:1px solid var(--edge);position:relative;overflow:hidden}
+    .card-banner::after{content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(108,143,255,.08) 0%,rgba(48,213,200,.05) 100%);pointer-events:none}
+    .banner-title{font-size:20px;font-weight:900;letter-spacing:-.3px;line-height:1;position:relative;z-index:1}
+    .banner-title span{color:var(--hero)}
+    .card-body{padding:16px 16px 20px}
+    @media(min-width:540px){.card-body{padding:20px 22px 24px}}
+    .sec-label{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+    .rank-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:8px;margin-bottom:2px}
+    .rank-arrow{display:flex;align-items:center;justify-content:center;color:var(--dim);flex-shrink:0;font-size:18px;padding-top:20px}
+    .rank-col{display:flex;flex-direction:column}
+    .rank-col-label{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+    .custom-select{position:relative;user-select:none}
+    .cs-trigger{display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg3);
+      border:1.5px solid var(--edge);border-radius:var(--r);cursor:pointer;
+      transition:border-color .15s,background .15s;font-size:13px;font-weight:700;
+      font-family:'Nunito',sans-serif;color:var(--snow)}
+    .cs-trigger:hover{border-color:var(--edge2)}
+    .custom-select.open .cs-trigger{border-color:var(--hero);background:#1e2540}
+    .cs-label{flex:1;font-size:12px}
+    .cs-arrow{transition:transform .2s;color:var(--dim);flex-shrink:0}
+    .custom-select.open .cs-arrow{transform:rotate(180deg);color:var(--hero)}
+    .cs-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;
+      background:var(--bg3);border:1.5px solid var(--edge2);border-radius:var(--r);
+      z-index:200;max-height:260px;overflow-y:auto;scrollbar-width:thin;
+      scrollbar-color:var(--edge) transparent;box-shadow:0 20px 48px rgba(0,0,0,.6)}
+    .custom-select.open .cs-dropdown{display:block}
+    .cs-option{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;
+      font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;color:var(--mist);
+      transition:background .1s,color .1s}
+    .cs-option:hover{background:rgba(108,143,255,.08);color:var(--snow)}
+    .cs-option.selected{color:var(--hero)}
+    .cs-group-header{padding:7px 12px 3px;font-size:9px;font-weight:800;letter-spacing:1.5px;
+      text-transform:uppercase;color:var(--dim);border-top:1px solid var(--edge)}
+    .cs-group-header:first-child{border-top:none}
+    .cs-divider{height:1px;background:var(--edge);margin:4px 0}
+    .rank-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;
+      justify-content:center;font-size:9px;font-weight:800;flex-shrink:0}
+    .pct-row-dual{display:grid;grid-template-columns:1fr 30px 1fr;gap:8px;margin-bottom:14px;align-items:center}
+    .pct-track-wrap{display:flex;align-items:center;gap:8px}
+    .pct-track{flex:1;position:relative;height:6px;border-radius:99px;background:var(--bg3);
+      border:1px solid var(--edge);cursor:pointer}
+    .pct-fill{position:absolute;top:0;left:0;height:100%;border-radius:99px;pointer-events:none}
+    .pct-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:24px;height:24px;
+      border-radius:50%;background:var(--hero);border:3px solid var(--bg2);
+      box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:grab;z-index:2;touch-action:none;
+      transition:transform .1s,box-shadow .1s}
+    .pct-thumb:hover{transform:translate(-50%,-50%) scale(1.15);box-shadow:0 0 0 6px rgba(108,143,255,.2)}
+    .pct-thumb.dragging{cursor:grabbing;transform:translate(-50%,-50%) scale(1.2);box-shadow:0 0 0 8px rgba(108,143,255,.15);transition:none}
+    .pct-val{font-family:'Fira Code',monospace;font-size:11px;font-weight:500;min-width:30px;text-align:right;color:var(--dim);flex-shrink:0}
+    .field{margin-bottom:14px}
+    .hr{height:1px;background:var(--edge);margin:2px 0 14px}
+    .toggles{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px}
+    .tog{display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--bg3);
+      border:1.5px solid var(--edge);border-radius:var(--r);cursor:pointer;user-select:none;
+      font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:var(--mist);
+      transition:border-color .15s,background .15s,color .15s}
+    .tog input{display:none}
+    .tog-switch{width:32px;height:18px;border-radius:99px;background:var(--edge2);position:relative;flex-shrink:0;transition:background .2s}
+    .tog-switch::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;
+      border-radius:50%;background:var(--dim);transition:transform .2s,background .2s}
+    .tog input:checked~.tog-switch{background:rgba(108,143,255,.3)}
+    .tog input:checked~.tog-switch::after{transform:translateX(14px);background:var(--hero)}
+    .tog:has(input:checked){border-color:rgba(108,143,255,.4);background:rgba(108,143,255,.06);color:var(--snow)}
+    .tog.free input:checked~.tog-switch{background:rgba(68,217,142,.25)}
+    .tog.free input:checked~.tog-switch::after{background:var(--green)}
+    .tog.free:has(input:checked){border-color:rgba(68,217,142,.35);background:rgba(68,217,142,.05)}
+    .tog-tag{font-size:10px;font-weight:800;color:var(--dim)}
+    .tog:has(input:checked) .tog-tag{color:var(--hero)}
+    .tog.free:has(input:checked) .tog-tag{color:var(--green)}
+    .duo-extra{margin-left:auto;font-size:10px;font-weight:800;color:var(--gold);opacity:0;
+      transform:translateY(4px);transition:opacity .3s ease,transform .3s ease}
+    .prog-wrap{margin-bottom:16px}
+    .prog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .prog-names{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+    .prog-from{color:var(--mist)}
+    .prog-arrow{color:var(--dim);font-size:10px}
+    .prog-to{color:var(--gold)}
+    .progress-track{position:relative;height:10px;border-radius:99px;cursor:pointer;overflow:visible}
+    .progress-bg{position:absolute;inset:0;background:var(--edge);border-radius:99px}
+    .progress-fill{position:absolute;top:0;height:100%;border-radius:99px;pointer-events:none;
+      background:linear-gradient(90deg,#a0522d 0%,#b0b8c8 16.6%,#f0b429 33.2%,#3ecfcf 50%,#4a9eff 66.6%,#3ddc84 83.2%,#f5a623 100%);
+      background-size:500px 100%}
+    .progress-tick{position:absolute;top:0;width:2px;height:100%;background:rgba(15,17,26,.7);pointer-events:none;z-index:1}
+    .progress-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:24px;height:24px;
+      border-radius:50%;border:3px solid var(--bg2);box-shadow:0 2px 10px rgba(0,0,0,.5);
+      cursor:grab;z-index:3;touch-action:none;transition:box-shadow .15s,transform .1s}
+    .progress-dot:hover{transform:translate(-50%,-50%) scale(1.2);box-shadow:0 0 0 6px rgba(255,255,255,.1)}
+    .progress-dot.dragging{cursor:grabbing;transform:translate(-50%,-50%) scale(1.25);box-shadow:0 0 0 8px rgba(255,255,255,.08);transition:none}
+    .dot-tooltip{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+      background:var(--bg3);border:1px solid var(--edge2);color:var(--snow);font-size:11px;
+      font-weight:700;white-space:nowrap;padding:4px 9px;border-radius:6px;pointer-events:none;
+      opacity:0;transition:opacity .15s;font-family:'Nunito',sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+    .progress-dot:hover .dot-tooltip,.progress-dot.dragging .dot-tooltip{opacity:1}
+    .progress-labels{position:relative;height:18px;margin-top:8px}
+    .progress-labels span{position:absolute;transform:translateX(-50%);font-size:9px;font-weight:800;
+      letter-spacing:1px;text-transform:uppercase;opacity:.65;font-family:'Nunito',sans-serif}
+    .price-box{background:var(--bg3);border:1.5px solid var(--edge);border-radius:var(--r);
+      padding:16px 18px 14px;margin-bottom:10px;position:relative;overflow:hidden}
+    .price-box::before{content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(108,143,255,.05) 0%,transparent 60%);pointer-events:none}
+    .price-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+    .price-meta{font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim)}
+    .price-original{font-family:'Fira Code',monospace;font-size:13px;color:var(--dim);text-decoration:line-through;height:18px;line-height:18px}
+    .price-val{font-family:'Nunito',sans-serif;font-size:44px;font-weight:900;color:var(--gold);
+      letter-spacing:-1px;line-height:1;margin-bottom:8px}
+    .price-val.error{font-size:14px;font-weight:700;color:var(--red);letter-spacing:0}
+    .price-badge{display:inline-block;height:22px;line-height:22px;border-radius:6px;font-size:11px;
+      font-weight:800;letter-spacing:.5px;padding:0 9px;background:transparent;color:transparent;
+      transition:background .2s,color .2s}
+    .price-badge.active{background:rgba(68,217,142,.12);color:var(--green)}
+    .copy-btn{width:100%;padding:13px;background:rgba(108,143,255,.08);
+      border:1.5px solid rgba(108,143,255,.25);border-radius:var(--r);color:var(--hero);
+      font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;letter-spacing:.5px;
+      cursor:pointer;transition:background .15s,border-color .15s;
+      display:flex;align-items:center;justify-content:center;gap:8px}
+    .copy-btn:hover{background:rgba(108,143,255,.14);border-color:var(--hero)}
+    .copy-btn.copied{background:rgba(68,217,142,.1);border-color:var(--green);color:var(--green)}
+    .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .order-btn{padding:13px;background:var(--hero);border:none;border-radius:var(--r);color:#fff;
+      font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;letter-spacing:.3px;cursor:pointer;
+      transition:background .15s,transform .1s,box-shadow .15s;display:flex;align-items:center;
+      justify-content:center;gap:7px;box-shadow:0 4px 16px rgba(108,143,255,.3)}
+    .order-btn:hover{background:#7d9cff;box-shadow:0 6px 24px rgba(108,143,255,.45);transform:translateY(-1px)}
+    .order-btn:active{transform:translateY(0)}
+    .footer-note{text-align:center;font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5}
+    @keyframes togBounce{0%{transform:scale(1)}40%{transform:scale(.94)}70%{transform:scale(1.04)}100%{transform:scale(1)}}
+    .tog.bounce{animation:togBounce .3s ease}
+    @keyframes selectPulse{0%{box-shadow:0 0 0 0 rgba(108,143,255,.4)}100%{box-shadow:0 0 0 6px rgba(108,143,255,0)}}
+    .cs-trigger.pulse{animation:selectPulse .4s ease-out}
+    @keyframes badgeIn{0%{opacity:0;transform:translateY(-4px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+    .price-badge.active{animation:badgeIn .25s ease}
+    .mode-switch{display:flex;background:var(--bg3);border:1.5px solid var(--edge);border-radius:var(--r);
+      padding:3px;margin-bottom:20px;gap:3px}
+    .mode-btn{flex:1;padding:8px;border:none;border-radius:7px;font-family:'Nunito',sans-serif;
+      font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.3px;
+      transition:background .2s,color .2s;background:transparent;color:var(--dim)}
+    .mode-btn.active{background:var(--hero);color:#fff;box-shadow:0 2px 8px rgba(108,143,255,.4)}
+    .pl-panel{display:none}
+    .pl-panel.active{display:block}
+    .range-wrap{margin-bottom:16px}
+    .range-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .range-val{font-family:'Fira Code',monospace;font-size:13px;font-weight:500;color:var(--hero)}
+    .range-num-input{width:64px;padding:6px 8px;background:var(--bg3);border:1.5px solid var(--edge);
+      border-radius:6px;color:var(--snow);font-family:'Fira Code',monospace;font-size:12px;
+      font-weight:500;text-align:center}
+    .range-num-input:focus{outline:none;border-color:var(--hero)}
+    .dual-range-wrap{position:relative;height:6px;border-radius:99px;margin:10px 0 8px;cursor:pointer}
+    .dual-range-bg{position:absolute;inset:0;background:var(--edge);border-radius:99px}
+    .dual-range-fill{position:absolute;top:0;height:100%;border-radius:99px;pointer-events:none}
+    .dual-range-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;
+      border-radius:50%;border:3px solid var(--bg2);box-shadow:0 2px 8px rgba(0,0,0,.4);
+      cursor:grab;z-index:2;touch-action:none;transition:box-shadow .1s}
+    .dual-range-thumb:hover{box-shadow:0 0 0 6px rgba(108,143,255,.2)}
+    .dual-range-thumb.dragging{cursor:grabbing;box-shadow:0 0 0 8px rgba(108,143,255,.15);transition:none}
+    .dual-range-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);font-family:'Fira Code',monospace}
+    .single-range-wrap{position:relative;height:6px;border-radius:99px;margin:10px 0 8px;cursor:pointer}
+    .single-range-bg{position:absolute;inset:0;background:var(--edge);border-radius:99px}
+    .single-range-fill{position:absolute;top:0;left:0;height:100%;border-radius:99px;background:var(--hero);pointer-events:none}
+    .single-range-thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;
+      border-radius:50%;background:var(--hero);border:3px solid var(--bg2);
+      box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:grab;z-index:2;touch-action:none}
+    .single-range-thumb:hover{box-shadow:0 0 0 6px rgba(108,143,255,.2)}
+    .single-range-thumb.dragging{cursor:grabbing;box-shadow:0 0 0 8px rgba(108,143,255,.15);transition:none}
+    .method-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+    .method-btn{padding:11px 10px;border:1.5px solid var(--edge);border-radius:var(--r);
+      background:var(--bg3);color:var(--mist);font-family:'Nunito',sans-serif;font-size:12px;
+      font-weight:800;cursor:pointer;transition:all .15s;text-align:center}
+    .method-btn.active{border-color:var(--hero);background:rgba(108,143,255,.08);color:var(--snow)}
+    .method-sub{display:block;font-size:9px;font-weight:600;color:var(--dim);margin-top:2px;letter-spacing:.5px}
+    .method-btn.active .method-sub{color:var(--green)}
   </style>
 </head>
 <body>
@@ -582,128 +204,98 @@
   <div class="card">
     <div class="card-banner">
       <div class="banner-title"><span>Overwatch</span> <span id="bannerMode">Rank Boost</span></div>
-      
     </div>
-
     <div class="card-body">
 
-      <!-- Mode switcher -->
       <div class="mode-switch">
-        <button class="mode-btn active" id="modeRank" onclick="switchMode('rank')">🏆 Rank</button>
-        <button class="mode-btn" id="modePl" onclick="switchMode('placement')">🎯 Placement</button>
-        <button class="mode-btn" id="modeBp" onclick="switchMode('battlepass')">⚡ Battle Pass</button>
-        <button class="mode-btn" id="modeDr" onclick="switchMode('drives')">🔥 Drives</button>
+        <button class="mode-btn active" onclick="switchMode('rank')">🏆 Rank</button>
+        <button class="mode-btn" onclick="switchMode('placement')">🎯 Placement</button>
+        <button class="mode-btn" onclick="switchMode('battlepass')">⚡ Battle Pass</button>
+        <button class="mode-btn" onclick="switchMode('drives')">🔥 Drives</button>
       </div>
 
-      <!-- RANK BOOST PANEL -->
+      <!-- RANK BOOST -->
       <div class="pl-panel active" id="rankPanel">
-
-      <!-- Rank row -->
-      <div class="sec-label">Your Route</div>
-      <div class="rank-row">
-        <div class="rank-col">
-          <div class="rank-col-label">Current</div>
-          <div class="custom-select" id="csFrom"></div>
-        </div>
-        <div class="rank-arrow">→</div>
-        <div class="rank-col">
-          <div class="rank-col-label">Desired</div>
-          <div class="custom-select" id="csTo"></div>
-        </div>
-      </div>
-
-      <!-- Pct sliders dual -->
-      <div class="pct-row-dual">
-        <div class="pct-track-wrap">
-          <div class="pct-track" id="pctFromTrack">
-            <div class="pct-fill" id="pctFromFill"></div>
-            <div class="pct-thumb" id="pctFromThumb"></div>
+        <div class="sec-label">Your Route</div>
+        <div class="rank-row">
+          <div class="rank-col">
+            <div class="rank-col-label">Current</div>
+            <div class="custom-select" id="csFrom"></div>
           </div>
-          <span class="pct-val" id="pctFromVal">0%</span>
-        </div>
-        <div></div>
-        <div class="pct-track-wrap">
-          <div class="pct-track" id="pctToTrack">
-            <div class="pct-fill" id="pctToFill"></div>
-            <div class="pct-thumb" id="pctToThumb"></div>
-          </div>
-          <span class="pct-val" id="pctToVal">0%</span>
-        </div>
-      </div>
-
-      <!-- Role -->
-      <div class="field">
-        <div class="sec-label">Role</div>
-        <div class="custom-select" id="csRole"></div>
-      </div>
-
-      <div class="hr"></div>
-
-      <!-- Toggles -->
-      <div class="toggles">
-        <label class="tog" id="duoLabel"><input type="checkbox" id="duoBoost"><span class="tog-switch"></span>Duo Boost<span class="tog-tag">+70%</span><span class="duo-extra" id="duoExtra"></span></label>
-        <label class="tog"><input type="checkbox" id="stream"><span class="tog-switch"></span>Stream<span class="tog-tag">+5%</span></label>
-        <label class="tog free"><input type="checkbox" id="offline"><span class="tog-switch"></span>Offline<span class="tog-tag">Free</span></label>
-        <label class="tog free"><input type="checkbox" id="vpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
-        <label class="tog" style="grid-column:span 2"><input type="checkbox" id="rankPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
-      </div>
-
-      <!-- Progress bar -->
-      <div class="prog-wrap">
-        <div class="prog-header">
-          <div class="sec-label" style="margin-bottom:0">Rank Map</div>
-          <div class="prog-names">
-            <span class="prog-from" id="progFrom">Gold V</span>
-            <span class="prog-arrow">▶</span>
-            <span class="prog-to" id="progTo">Diamond V</span>
+          <div class="rank-arrow">→</div>
+          <div class="rank-col">
+            <div class="rank-col-label">Desired</div>
+            <div class="custom-select" id="csTo"></div>
           </div>
         </div>
-        <div class="progress-track" id="progressTrack">
-          <div class="progress-bg"></div>
-          <div class="progress-fill" id="progressFill"></div>
-          <div class="progress-dot" id="dotFrom"><div class="dot-tooltip" id="tipFrom"></div></div>
-          <div class="progress-dot" id="dotTo"><div class="dot-tooltip" id="tipTo"></div></div>
+        <div class="pct-row-dual">
+          <div class="pct-track-wrap">
+            <div class="pct-track" id="pctFromTrack">
+              <div class="pct-fill" id="pctFromFill"></div>
+              <div class="pct-thumb" id="pctFromThumb"></div>
+            </div>
+            <span class="pct-val" id="pctFromVal">0%</span>
+          </div>
+          <div></div>
+          <div class="pct-track-wrap">
+            <div class="pct-track" id="pctToTrack">
+              <div class="pct-fill" id="pctToFill"></div>
+              <div class="pct-thumb" id="pctToThumb"></div>
+            </div>
+            <span class="pct-val" id="pctToVal">0%</span>
+          </div>
         </div>
-        <div class="progress-labels" id="progressLabels"></div>
-      </div>
-
-      <!-- Price -->
-      <div class="price-box">
-        <div class="price-top">
-          <span class="price-meta">Total Price</span>
-          <div class="price-original" id="priceOriginal"></div>
+        <div class="field">
+          <div class="sec-label">Role</div>
+          <div class="custom-select" id="csRole"></div>
         </div>
-        <div class="price-val" id="priceOutput">—</div>
-        <div class="price-badge" id="priceBadge"></div>
+        <div class="hr"></div>
+        <div class="toggles">
+          <label class="tog"><input type="checkbox" id="duoBoost"><span class="tog-switch"></span>Duo Boost<span class="tog-tag">+70%</span><span class="duo-extra" id="duoExtra"></span></label>
+          <label class="tog"><input type="checkbox" id="stream"><span class="tog-switch"></span>Stream<span class="tog-tag">+5%</span></label>
+          <label class="tog free"><input type="checkbox" id="offline"><span class="tog-switch"></span>Offline<span class="tog-tag">Free</span></label>
+          <label class="tog free"><input type="checkbox" id="vpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
+          <label class="tog" style="grid-column:span 2"><input type="checkbox" id="rankPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
+        </div>
+        <div class="prog-wrap">
+          <div class="prog-header">
+            <div class="sec-label" style="margin-bottom:0">Rank Map</div>
+            <div class="prog-names">
+              <span class="prog-from" id="progFrom">Gold V</span>
+              <span class="prog-arrow">▶</span>
+              <span class="prog-to" id="progTo">Diamond V</span>
+            </div>
+          </div>
+          <div class="progress-track" id="progressTrack">
+            <div class="progress-bg"></div>
+            <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-dot" id="dotFrom"><div class="dot-tooltip" id="tipFrom"></div></div>
+            <div class="progress-dot" id="dotTo"><div class="dot-tooltip" id="tipTo"></div></div>
+          </div>
+          <div class="progress-labels" id="progressLabels"></div>
+        </div>
+        <div class="price-box">
+          <div class="price-top"><span class="price-meta">Total Price</span><div class="price-original" id="priceOriginal"></div></div>
+          <div class="price-val" id="priceOutput">—</div>
+          <div class="price-badge" id="priceBadge"></div>
+        </div>
+        <div class="btn-row">
+          <button class="copy-btn" id="copyBtn" data-copy="rank">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Copy
+          </button>
+          <button class="order-btn" onclick="openDiscord()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+            Discord
+          </button>
+        </div>
+        <p class="footer-note">Copy your order details, then send them to me on Discord</p>
       </div>
 
-      <div class="btn-row">
-        <button class="copy-btn" id="copyBtn">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-          </svg>
-          Copy
-        </button>
-        <button class="order-btn" id="orderBtn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/>
-          </svg>
-          Discord
-        </button>
-      </div>
-      <p style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5">
-        Copy your order details, then send them to me on Discord
-      </p>
-
-      </div><!-- end rankPanel -->
-
-      <!-- PLACEMENTS PANEL -->
+      <!-- PLACEMENTS -->
       <div class="pl-panel" id="placementPanel">
-
         <div class="sec-label">Last Season Rank</div>
         <div class="custom-select" id="csPlTier" style="margin-bottom:16px"></div>
-
         <div class="range-wrap">
           <div class="range-header">
             <span class="sec-label" style="margin-bottom:0">Games to Play</span>
@@ -716,66 +308,42 @@
           </div>
           <div class="dual-range-labels"><span>1</span><span>10</span></div>
         </div>
-
         <div class="sec-label">Boost Method</div>
         <div class="method-row">
-          <button class="method-btn active" id="methodPilot" onclick="setMethod('pilot')">
-            🎮 Piloted
-            <span class="method-sub">✓ 70% wins guaranteed</span>
-          </button>
-          <button class="method-btn" id="methodDuo" onclick="setMethod('duo')">
-            👥 Duo +70%
-            <span class="method-sub">No guarantee</span>
-          </button>
+          <button class="method-btn active" id="methodPilot" onclick="setMethod('pilot')">🎮 Piloted<span class="method-sub">✓ 70% wins guaranteed</span></button>
+          <button class="method-btn" id="methodDuo" onclick="setMethod('duo')">👥 Duo +70%<span class="method-sub">No guarantee</span></button>
         </div>
-
         <div class="field">
           <div class="sec-label">Role</div>
           <div class="custom-select" id="csPlRole"></div>
         </div>
-
         <div class="hr"></div>
-
         <div class="toggles" style="margin-bottom:14px">
           <label class="tog"><input type="checkbox" id="plStream"><span class="tog-switch"></span>Stream<span class="tog-tag">+5%</span></label>
-          <label class="tog" style=""><input type="checkbox" id="plPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
+          <label class="tog"><input type="checkbox" id="plPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
           <label class="tog free"><input type="checkbox" id="plOffline"><span class="tog-switch"></span>Offline<span class="tog-tag">Free</span></label>
           <label class="tog free"><input type="checkbox" id="plVpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
         </div>
-
         <div class="price-box">
-          <div class="price-top">
-            <span class="price-meta">Total Price</span>
-            <div class="price-original" id="plOriginal"></div>
-          </div>
+          <div class="price-top"><span class="price-meta">Total Price</span><div class="price-original" id="plOriginal"></div></div>
           <div class="price-val" id="plOutput">—</div>
           <div class="price-badge" id="plBadge"></div>
         </div>
-
         <div class="btn-row">
-          <button class="copy-btn" id="plCopyBtn">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
-              <path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-            </svg>
+          <button class="copy-btn" id="plCopyBtn" data-copy="placement">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
             Copy
           </button>
-          <button class="order-btn" onclick="window.open('https://discord.gg/aP6vKM5e','_blank')">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/>
-            </svg>
+          <button class="order-btn" onclick="openDiscord()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
             Discord
           </button>
         </div>
-        <p style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5">
-          Copy your order details, then send them to me on Discord
-        </p>
+        <p class="footer-note">Copy your order details, then send them to me on Discord</p>
+      </div>
 
-      </div><!-- end placementPanel -->
-
-      <!-- BATTLE PASS PANEL -->
+      <!-- BATTLE PASS -->
       <div class="pl-panel" id="bpPanel">
-
         <div class="range-wrap">
           <div class="range-header">
             <span class="sec-label" style="margin-bottom:0">Level Range</span>
@@ -794,56 +362,44 @@
             <div style="flex:1"><div class="rank-col-label">To</div><input type="number" id="bpTo" min="2" max="200" value="100" class="range-num-input" style="width:100%"></div>
           </div>
         </div>
-
         <div class="sec-label">Role Preference</div>
         <div class="method-row" style="margin-bottom:16px">
-          <button class="method-btn active" id="bpRoleAny" onclick="setBpRole('any')">
-            Any Role
-            <span class="method-sub">Standard price</span>
-          </button>
-          <button class="method-btn" id="bpRoleLock" onclick="setBpRole('lock')">
-            Role Lock
-            <span class="method-sub">+10%</span>
-          </button>
+          <button class="method-btn active" id="bpRoleAny" onclick="setBpRole('any')">Any Role<span class="method-sub">Standard price</span></button>
+          <button class="method-btn" id="bpRoleLock" onclick="setBpRole('lock')">Role Lock<span class="method-sub">+10%</span></button>
         </div>
-
         <div class="field" id="bpRoleLockField" style="display:none">
           <div class="sec-label">Preferred Role</div>
           <div class="custom-select" id="csBpRole"></div>
         </div>
-
         <div class="hr"></div>
-
         <div class="toggles" style="margin-bottom:14px">
           <label class="tog"><input type="checkbox" id="bpStream"><span class="tog-switch"></span>Stream<span class="tog-tag">+5%</span></label>
           <label class="tog"><input type="checkbox" id="bpPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
           <label class="tog free"><input type="checkbox" id="bpOffline"><span class="tog-switch"></span>Offline<span class="tog-tag">Free</span></label>
           <label class="tog free"><input type="checkbox" id="bpVpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
         </div>
-
         <div class="price-box">
-          <div class="price-top">
-            <span class="price-meta">Total Price</span>
-            <div class="price-original" id="bpOriginal"></div>
-          </div>
+          <div class="price-top"><span class="price-meta">Total Price</span><div class="price-original" id="bpOriginal"></div></div>
           <div class="price-val" id="bpOutput">—</div>
           <div class="price-badge" id="bpBadge"></div>
         </div>
-
         <div class="btn-row">
-          <button class="copy-btn" id="bpCopyBtn"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Copy</button>
-          <button class="order-btn" onclick="window.open('https://discord.gg/aP6vKM5e','_blank')"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg> Discord</button>
+          <button class="copy-btn" id="bpCopyBtn" data-copy="battlepass">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Copy
+          </button>
+          <button class="order-btn" onclick="openDiscord()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+            Discord
+          </button>
         </div>
-        <p style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5">Copy your order details, then send them to me on Discord</p>
+        <p class="footer-note">Copy your order details, then send them to me on Discord</p>
+      </div>
 
-      </div><!-- end bpPanel -->
-
-      <!-- COMPETITIVE DRIVES PANEL -->
+      <!-- DRIVES -->
       <div class="pl-panel" id="drPanel">
-
         <div class="sec-label">Your Rank</div>
         <div class="custom-select" id="csDrTier" style="margin-bottom:16px"></div>
-
         <div class="range-wrap">
           <div class="range-header">
             <span class="sec-label" style="margin-bottom:0">Drive Points</span>
@@ -863,1182 +419,823 @@
           <div class="dual-range-labels" style="margin-bottom:4px"><span>0</span><span>4000</span></div>
           <div style="margin-bottom:8px;font-size:11px;color:var(--dim);text-align:center" id="drRangeLabel">4000 points (full drive)</div>
         </div>
-
         <div class="hr"></div>
-
         <div class="field">
           <div class="sec-label">Role</div>
           <div class="custom-select" id="csDrRole"></div>
         </div>
-
         <div class="hr"></div>
-
         <div class="toggles" style="margin-bottom:14px">
           <label class="tog"><input type="checkbox" id="drDuo"><span class="tog-switch"></span>Duo<span class="tog-tag">+50%</span></label>
           <label class="tog"><input type="checkbox" id="drStream"><span class="tog-switch"></span>Stream<span class="tog-tag">+5%</span></label>
           <label class="tog"><input type="checkbox" id="drPs"><span class="tog-switch"></span>PlayStation<span class="tog-tag">+50%</span></label>
           <label class="tog free"><input type="checkbox" id="drVpn" checked><span class="tog-switch"></span>VPN<span class="tog-tag">Free</span></label>
         </div>
-
         <div class="price-box">
-          <div class="price-top">
-            <span class="price-meta">Total Price</span>
-            <div class="price-original" id="drOriginal"></div>
-          </div>
+          <div class="price-top"><span class="price-meta">Total Price</span><div class="price-original" id="drOriginal"></div></div>
           <div class="price-val" id="drOutput">—</div>
           <div class="price-badge" id="drBadge"></div>
         </div>
-
         <div class="btn-row">
-          <button class="copy-btn" id="drCopyBtn"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Copy</button>
-          <button class="order-btn" onclick="window.open('https://discord.gg/aP6vKM5e','_blank')"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg> Discord</button>
+          <button class="copy-btn" id="drCopyBtn" data-copy="drives">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Copy
+          </button>
+          <button class="order-btn" onclick="openDiscord()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+            Discord
+          </button>
         </div>
-        <p style="text-align:center;font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5">Copy your order details, then send them to me on Discord</p>
-
-      </div><!-- end drPanel -->
+        <p class="footer-note">Copy your order details, then send them to me on Discord</p>
+      </div>
 
     </div>
   </div>
 
 <script>
-  const TIERS = ["bronze","silver","gold","platinum","diamond","master","grandmaster"];
-  const DIVS  = [5,4,3,2,1];
-  const DIV_LABEL = {5:"V",4:"IV",3:"III",2:"II",1:"I"};
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const DISCORD_URL = 'https://discord.gg/aP6vKM5e';
+const TIERS = ['bronze','silver','gold','platinum','diamond','master','grandmaster'];
+const DIVS  = [5,4,3,2,1];
+const DIV_LABEL = {5:'V',4:'IV',3:'III',2:'II',1:'I'};
 
-  const TIER_META = {
-    bronze:      {label:"Bronze",      color:"#a0522d", bg:"rgba(160,82,45,0.2)",   symbol:"▲"},
-    silver:      {label:"Silver",      color:"#b0b8c8", bg:"rgba(176,184,200,0.2)", symbol:"◆"},
-    gold:        {label:"Gold",        color:"#f0b429", bg:"rgba(240,180,41,0.2)",  symbol:"★"},
-    platinum:    {label:"Platinum",    color:"#3ecfcf", bg:"rgba(62,207,207,0.2)",  symbol:"◈"},
-    diamond:     {label:"Diamond",     color:"#4a9eff", bg:"rgba(74,158,255,0.2)",  symbol:"◇"},
-    master:      {label:"Master",      color:"#3ddc84", bg:"rgba(61,220,132,0.2)",  symbol:"⬡"},
-    grandmaster: {label:"Grandmaster", color:"#f5a623", bg:"rgba(245,166,35,0.2)",  symbol:"♛"},
+const TIER_META = {
+  bronze:      {label:'Bronze',      color:'#a0522d', bg:'rgba(160,82,45,0.2)',   symbol:'▲'},
+  silver:      {label:'Silver',      color:'#b0b8c8', bg:'rgba(176,184,200,0.2)', symbol:'◆'},
+  gold:        {label:'Gold',        color:'#f0b429', bg:'rgba(240,180,41,0.2)',  symbol:'★'},
+  platinum:    {label:'Platinum',    color:'#3ecfcf', bg:'rgba(62,207,207,0.2)',  symbol:'◈'},
+  diamond:     {label:'Diamond',     color:'#4a9eff', bg:'rgba(74,158,255,0.2)',  symbol:'◇'},
+  master:      {label:'Master',      color:'#3ddc84', bg:'rgba(61,220,132,0.2)',  symbol:'⬡'},
+  grandmaster: {label:'Grandmaster', color:'#f5a623', bg:'rgba(245,166,35,0.2)',  symbol:'♛'},
+};
+const PL_TIER_META = {
+  unranked: {label:'Unranked', color:'#6a7080', bg:'rgba(106,112,128,0.18)', symbol:'?'},
+  ...TIER_META
+};
+const PL_TIERS = ['unranked', ...TIERS];
+
+const ROLES = [
+  {value:'tank',    label:'Tank',    solo:1.00, duo:1.15, group:'main'},
+  {value:'dd',      label:'DD',      solo:1.00, duo:1.05, group:'main'},
+  {value:'support', label:'Support', solo:1.15, duo:1.00, group:'main'},
+  {value:'openq',   label:'6v6',     solo:1.00, duo:1.00, group:'mode'},
+];
+
+const DISCOUNT = [0,0,0.05,0.10,0.15,0.15,0.15];
+const DRIVE_PRICE = {bronze:10,silver:15,gold:20,platinum:25,diamond:30,master:60,grandmaster:200};
+const WIN_PRICE = {unranked:.30,bronze:.45,silver:.95,gold:1.47,platinum:2.25,diamond:4.25,master:6.50,grandmaster:12.50};
+
+const GLOBAL_BASE = 0.45, LOW_GROWTH = 1.098, HIGH_GROWTH = 1.25;
+const BP_R = Math.pow(1.5/0.20, 1/199), BP_BASE = 0.20;
+
+const RANKS = TIERS.flatMap(tier => DIVS.map(div => ({key:`${tier}${div}`,label:`${TIER_META[tier].label} ${DIV_LABEL[div]}`,tier,div})));
+const TOTAL = RANKS.length;
+
+// ─── SVG ICONS ───────────────────────────────────────────────────────────────
+const ICON_COPY = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+const ICON_CHECK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const ARROW_SVG = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let fromIdx = RANKS.findIndex(r => r.key === 'gold5');
+let toIdx   = RANKS.findIndex(r => r.key === 'diamond5');
+let roleVal = 'tank';
+let pctFrom = 0, pctTo = 0;
+let plTier = 'gold', plGames = 5, plMethod = 'pilot', plRole = 'tank';
+let bpRole = 'any', bpPreferredRole = 'tank';
+let drTier = 'gold', drRoleVal = 'any';
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const idxToPct = i => (i / (TOTAL - 1)) * 100;
+const openDiscord = () => window.open(DISCORD_URL, '_blank');
+
+function closeAllSelects() {
+  document.querySelectorAll('.custom-select.open').forEach(el => el.classList.remove('open'));
+}
+
+function gradientColor(p) {
+  const stops = [{p:0,r:160,g:82,b:45},{p:16.6,r:176,g:184,b:200},{p:33.2,r:240,g:180,b:41},
+    {p:50,r:62,g:207,b:207},{p:66.6,r:74,g:158,b:255},{p:83.2,r:61,g:220,b:132},{p:100,r:245,g:166,b:35}];
+  let a = stops[0], b = stops[stops.length-1];
+  for (let i = 0; i < stops.length-1; i++) {
+    if (p >= stops[i].p && p <= stops[i+1].p) { a = stops[i]; b = stops[i+1]; break; }
+  }
+  const t = b.p === a.p ? 0 : (p - a.p) / (b.p - a.p);
+  return `rgb(${Math.round(a.r+(b.r-a.r)*t)},${Math.round(a.g+(b.g-a.g)*t)},${Math.round(a.b+(b.b-a.b)*t)})`;
+}
+
+function rankIcon(tier, size = 20) {
+  const m = TIER_META[tier];
+  return `<span class="rank-icon" style="width:${size}px;height:${size}px;background:${m.bg};color:${m.color};font-size:${Math.round(size*.44)}px">${m.symbol}</span>`;
+}
+
+function makeDraggable1D(el, onMove, getX) {
+  // Generic 1D drag helper: calls onMove(rawX) on pointer move
+  let dragging = false;
+  el.addEventListener('mousedown', e => { dragging = true; el.classList.add('dragging'); e.preventDefault(); });
+  el.addEventListener('touchstart', e => { dragging = true; el.classList.add('dragging'); e.preventDefault(); }, {passive:false});
+  document.addEventListener('mousemove', e => { if (dragging) onMove(getX(e.clientX)); });
+  document.addEventListener('touchmove', e => { if (dragging) onMove(getX(e.touches[0].clientX)); }, {passive:true});
+  const stop = () => { if (dragging) { dragging = false; el.classList.remove('dragging'); } };
+  document.addEventListener('mouseup', stop);
+  document.addEventListener('touchend', stop);
+}
+
+function makeDualRangeSlider({trackId, fillId, thumbFromId, thumbToId, min, max, initFrom, initTo, onPaint}) {
+  const track = $(trackId), fill = $(fillId);
+  const thumbF = $(thumbFromId), thumbT = $(thumbToId);
+  let fromV = initFrom, toV = initTo;
+
+  function paint() {
+    const fp = (fromV - min) / (max - min) * 100;
+    const tp = (toV - min) / (max - min) * 100;
+    fill.style.left = fp + '%'; fill.style.width = (tp - fp) + '%';
+    fill.style.background = 'var(--hero)';
+    thumbF.style.left = fp + '%'; thumbT.style.left = tp + '%';
+    onPaint(fromV, toV);
+  }
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, Math.round(v))); }
+  function rawFromCX(cx) { const r = track.getBoundingClientRect(); return min + ((cx - r.left) / r.width) * (max - min); }
+
+  function moveFrom(raw) {
+    fromV = clamp(raw, min, max - 1);
+    if (fromV >= toV) toV = clamp(fromV + 1, min + 1, max);
+    paint();
+  }
+  function moveTo(raw) {
+    toV = clamp(raw, min + 1, max);
+    if (toV <= fromV) fromV = clamp(toV - 1, min, max - 1);
+    paint();
+  }
+
+  makeDraggable1D(thumbF, x => moveFrom(rawFromCX(x)), x => x);
+  makeDraggable1D(thumbT, x => moveTo(rawFromCX(x)), x => x);
+
+  // Segment drag
+  let dragSeg = false, segStartX = 0, segStartFrom = fromV, segStartTo = toV;
+  track.addEventListener('mousedown', e => {
+    const fp = (fromV - min) / (max - min), tp = (toV - min) / (max - min);
+    const r = track.getBoundingClientRect();
+    const pos = (e.clientX - r.left) / r.width;
+    if (pos > fp + .02 && pos < tp - .02) {
+      dragSeg = true; segStartX = e.clientX; segStartFrom = fromV; segStartTo = toV; e.preventDefault();
+    }
+  });
+  track.addEventListener('touchstart', e => {
+    const fp = (fromV - min) / (max - min), tp = (toV - min) / (max - min);
+    const r = track.getBoundingClientRect();
+    const pos = (e.touches[0].clientX - r.left) / r.width;
+    if (pos > fp + .02 && pos < tp - .02) {
+      dragSeg = true; segStartX = e.touches[0].clientX; segStartFrom = fromV; segStartTo = toV; e.preventDefault();
+    }
+  }, {passive:false});
+  function onSegMove(cx) {
+    if (!dragSeg) return;
+    const r = track.getBoundingClientRect();
+    const delta = Math.round(((cx - segStartX) / r.width) * (max - min));
+    let nf = segStartFrom + delta, nt = segStartTo + delta;
+    if (nf < min) { nt += min - nf; nf = min; }
+    if (nt > max) { nf -= nt - max; nt = max; }
+    fromV = Math.max(min, nf); toV = Math.min(max, nt); paint();
+  }
+  document.addEventListener('mousemove', e => onSegMove(e.clientX));
+  document.addEventListener('touchmove', e => onSegMove(e.touches[0].clientX), {passive:true});
+  document.addEventListener('mouseup', () => { dragSeg = false; });
+  document.addEventListener('touchend', () => { dragSeg = false; });
+
+  paint();
+  return { getFrom: () => fromV, getTo: () => toV, moveFrom, moveTo };
+}
+
+function buildTrigger() {
+  const el = document.createElement('div');
+  el.className = 'cs-trigger';
+  return el;
+}
+
+function buildDropdown() {
+  const el = document.createElement('div');
+  el.className = 'cs-dropdown';
+  return el;
+}
+
+function attachTriggerClick(container, trigger) {
+  trigger.addEventListener('click', e => {
+    e.stopPropagation();
+    const was = container.classList.contains('open');
+    closeAllSelects();
+    if (!was) container.classList.add('open');
+  });
+}
+
+// ─── COPY UTILITY ────────────────────────────────────────────────────────────
+function copyText(text, btn) {
+  function showCopied() {
+    btn.classList.add('copied');
+    btn.innerHTML = ICON_CHECK + ' Copied!';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = ICON_COPY + ' Copy'; }, 2000);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopy(text, showCopied));
+  } else {
+    fallbackCopy(text, showCopied);
+  }
+}
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;top:-9999px;opacity:0';
+  document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, 99999);
+  try { document.execCommand('copy'); cb(); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+function updatePriceBox(ids, price, noDiscPrice, discountAmt, discLabel) {
+  const out = $(ids.output);
+  out.className = 'price-val';
+  out.textContent = price;
+  if (discountAmt > 0) {
+    $(ids.original).textContent = noDiscPrice;
+    $(ids.badge).textContent = discLabel;
+    $(ids.badge).classList.add('active');
+  } else {
+    $(ids.original).textContent = '';
+    $(ids.badge).textContent = discLabel || '';
+    if (discLabel) $(ids.badge).classList.add('active');
+    else $(ids.badge).classList.remove('active');
+  }
+}
+
+// ─── RANK BOOST LOGIC ────────────────────────────────────────────────────────
+function stepPrice(tier, div) {
+  const index = TIERS.indexOf(tier) * 5 + (5 - div);
+  let price = GLOBAL_BASE;
+  if (index <= 25) {
+    price *= Math.pow(LOW_GROWTH, index);
+  } else {
+    price *= Math.pow(LOW_GROWTH, 25) * Math.pow(HIGH_GROWTH, index - 25);
+  }
+  return Math.round(price * 1000) / 1000;
+}
+
+function calcBase(fIdx, tIdx, pFrom, pTo) {
+  if (fIdx === tIdx) return 0;
+  let total = 0;
+  for (let i = fIdx; i < tIdx; i++) {
+    const p = stepPrice(RANKS[i].tier, RANKS[i].div);
+    total += (i === fIdx) ? p * ((100 - pFrom) / 100) : p;
+  }
+  total += stepPrice(RANKS[tIdx].tier, RANKS[tIdx].div) * (pTo / 100);
+  return Math.max(0, total);
+}
+
+function tiersSpanned(f, t) { return TIERS.indexOf(RANKS[t].tier) - TIERS.indexOf(RANKS[f].tier); }
+
+function duoSurcharge() {
+  const master5idx = RANKS.findIndex(r => r.tier === 'master' && r.div === 5);
+  if (toIdx < master5idx) return 0;
+  const progress = (toIdx - master5idx) / (RANKS.length - 1 - master5idx);
+  return Math.round(Math.pow(progress, 1.8) * 47);
+}
+
+function applyRankMults(base) {
+  let t = base;
+  const isDuo = $('duoBoost').checked;
+  if (isDuo) t *= 1 + 0.70 + duoSurcharge() / 100;
+  if ($('stream').checked) t *= 1.05;
+  if ($('rankPs').checked) t *= 1.50;
+  const role = ROLES.find(r => r.value === roleVal);
+  if (role) t *= isDuo ? role.duo : role.solo;
+  return t;
+}
+
+function render() {
+  updateProgress();
+  csFromCtrl.setIdx(fromIdx);
+  csToCtrl.setIdx(toIdx);
+
+  const out = $('priceOutput');
+  if (toIdx <= fromIdx) {
+    out.textContent = 'Select a higher rank'; out.className = 'price-val error';
+    $('priceOriginal').textContent = ''; $('priceBadge').textContent = ''; $('priceBadge').classList.remove('active');
+    return;
+  }
+  const base = calcBase(fromIdx, toIdx, pctFrom, pctTo);
+  const noDisc = applyRankMults(base);
+  const dr = DISCOUNT[Math.min(tiersSpanned(fromIdx, toIdx), DISCOUNT.length - 1)];
+  const final = noDisc * (1 - dr);
+
+  out.className = 'price-val';
+  out.textContent = '$' + final.toFixed(2);
+
+  const surcharge = duoSurcharge();
+  const extraEl = $('duoExtra');
+  extraEl.textContent = surcharge > 0 ? '+' + surcharge + '%' : '';
+  extraEl.style.opacity = surcharge > 0 ? '1' : '0';
+  extraEl.style.transform = surcharge > 0 ? 'translateY(0)' : 'translateY(4px)';
+
+  if (dr > 0) {
+    $('priceOriginal').textContent = '$' + noDisc.toFixed(2);
+    $('priceBadge').textContent = `Save $${(noDisc - final).toFixed(2)} · ${dr * 100}% off`;
+    $('priceBadge').classList.add('active');
+  } else {
+    $('priceOriginal').textContent = ''; $('priceBadge').textContent = ''; $('priceBadge').classList.remove('active');
+  }
+}
+
+// ─── RANK SELECT ─────────────────────────────────────────────────────────────
+function buildRankSelect(cid, ini, onChange) {
+  const container = $(cid); let cur = ini;
+  const trigger = buildTrigger();
+  const dropdown = buildDropdown();
+  const getLabel = i => `${rankIcon(RANKS[i].tier)} <span class="cs-label">${RANKS[i].label}</span>`;
+
+  trigger.innerHTML = getLabel(cur) + ARROW_SVG;
+  let lastTier = null;
+  RANKS.forEach((rank, idx) => {
+    if (rank.tier !== lastTier) {
+      const h = document.createElement('div'); h.className = 'cs-group-header';
+      h.innerHTML = `<span style="color:${TIER_META[rank.tier].color}">${TIER_META[rank.tier].label}</span>`;
+      dropdown.appendChild(h); lastTier = rank.tier;
+    }
+    const opt = document.createElement('div');
+    opt.className = 'cs-option' + (idx === cur ? ' selected' : '');
+    opt.dataset.idx = idx;
+    opt.innerHTML = `${rankIcon(rank.tier, 18)} ${rank.label}`;
+    opt.addEventListener('click', () => {
+      cur = idx; trigger.innerHTML = getLabel(cur) + ARROW_SVG;
+      dropdown.querySelectorAll('.cs-option').forEach(o => o.classList.toggle('selected', +o.dataset.idx === cur));
+      container.classList.remove('open'); onChange(cur);
+    });
+    dropdown.appendChild(opt);
+  });
+
+  attachTriggerClick(container, trigger);
+  container.appendChild(trigger); container.appendChild(dropdown);
+
+  return {
+    setIdx(idx) {
+      cur = idx; trigger.innerHTML = getLabel(cur) + ARROW_SVG;
+      dropdown.querySelectorAll('.cs-option').forEach(o => o.classList.toggle('selected', +o.dataset.idx === cur));
+    }
   };
+}
 
-  // Global exponential curve: LOW_GROWTH for Bronze-Diamond, HIGH_GROWTH for Master-GM
-  const GLOBAL_BASE = 0.45;
-  const LOW_GROWTH  = 1.098;
-  const HIGH_GROWTH = 1.25;
+// ─── ROLE SELECT (generic) ───────────────────────────────────────────────────
+function buildRoleSelect(cid, {isDuoFn = () => false, extraValues = [], onChange} = {}) {
+  const container = $(cid);
+  const trigger = buildTrigger();
+  const dropdown = buildDropdown();
+  let curRole = 'tank';
 
-  const ROLES = [
-    {value:"tank",    label:"Tank",    solo:1.00, duo:1.15, group:"main"},
-    {value:"dd",      label:"DD",      solo:1.00, duo:1.05, group:"main"},
-    {value:"support", label:"Support", solo:1.15, duo:1.00, group:"main"},
-    {value:"openq",   label:"6v6", solo:1.00, duo:1.00, group:"mode"},
-  ];
-
-  const DISCOUNT = [0,0,0.05,0.10,0.15,0.15,0.15];
-
-  const RANKS = TIERS.flatMap(tier =>
-    DIVS.map(div => ({key:`${tier}${div}`, label:`${TIER_META[tier].label} ${DIV_LABEL[div]}`, tier, div}))
-  );
-  const TOTAL = RANKS.length;
-
-  let fromIdx = RANKS.findIndex(r => r.key === "gold5");
-  let toIdx   = RANKS.findIndex(r => r.key === "diamond5");
-  let roleVal = "tank";
-  let isDuo   = false;
-  let pctFrom = 0, pctTo = 0;
-  let isDragging = false;
-
-  const $ = id => document.getElementById(id);
-  const idxToPct = i => (i / (TOTAL - 1)) * 100;
-
-  function gradientColor(p) {
-    const stops=[{p:0,r:160,g:82,b:45},{p:16.6,r:176,g:184,b:200},{p:33.2,r:240,g:180,b:41},
-      {p:50,r:62,g:207,b:207},{p:66.6,r:74,g:158,b:255},{p:83.2,r:61,g:220,b:132},{p:100,r:245,g:166,b:35}];
-    let a=stops[0],b=stops[stops.length-1];
-    for(let i=0;i<stops.length-1;i++){if(p>=stops[i].p&&p<=stops[i+1].p){a=stops[i];b=stops[i+1];break;}}
-    const t=(b.p===a.p)?0:(p-a.p)/(b.p-a.p);
-    return `rgb(${Math.round(a.r+(b.r-a.r)*t)},${Math.round(a.g+(b.g-a.g)*t)},${Math.round(a.b+(b.b-a.b)*t)})`;
+  function sfx(rv) {
+    const role = ROLES.find(r => r.value === rv);
+    if (!role) return '';
+    const m = isDuoFn() ? role.duo : role.solo;
+    return m !== 1 ? ` <span style="color:#6c8fff;font-size:10px">+${Math.round((m-1)*100)}%</span>` : '';
   }
 
-  function rankIcon(tier,size=20){
-    const m=TIER_META[tier];
-    return `<span class="rank-icon" style="width:${size}px;height:${size}px;background:${m.bg};color:${m.color};font-size:${Math.round(size*0.44)}px">${m.symbol}</span>`;
-  }
-
-  function stepPrice(tier, div) {
-    const index = TIERS.indexOf(tier) * 5 + (5 - div);
-    let price = GLOBAL_BASE;
-    if (index <= 25) {
-      price *= Math.pow(LOW_GROWTH, index);
-    } else {
-      price *= Math.pow(LOW_GROWTH, 25);
-      price *= Math.pow(HIGH_GROWTH, index - 25);
-    }
-    return Math.round(price * 1000) / 1000;
-  }
-
-  function calcBase(fIdx,tIdx,pFrom,pTo){
-    if(fIdx===tIdx)return 0;
-    let total=0;
-    for(let i=fIdx;i<tIdx;i++){
-      const p=stepPrice(RANKS[i].tier,RANKS[i].div);
-      total+=(i===fIdx)?p*((100-pFrom)/100):p;
-    }
-    total+=stepPrice(RANKS[tIdx].tier,RANKS[tIdx].div)*(pTo/100);
-    return Math.max(0,total);
-  }
-
-  function duoSurcharge() {
-    const master5idx = RANKS.findIndex(r => r.tier === "master" && r.div === 5);
-    const gm1idx     = RANKS.length - 1;
-    if (toIdx < master5idx) return 0;
-    const progress = (toIdx - master5idx) / (gm1idx - master5idx);
-    const curve = Math.pow(progress, 1.8);
-    return Math.round(curve * 47);
-  }
-
-  function duoMultiplier() {
-    return 1 + 0.70 + duoSurcharge() / 100;
-  }
-
-  function applyMults(base){
-    let t=base;
-    if(isDuo) t *= duoMultiplier();
-    if($("stream").checked) t *= 1.05;
-    if($("rankPs").checked) t *= 1.50;
-    const role=ROLES.find(r=>r.value===roleVal);
-    if(role)t*=isDuo?role.duo:role.solo;
-    return t;
-  }
-
-  function tiersSpanned(f,t){return TIERS.indexOf(RANKS[t].tier)-TIERS.indexOf(RANKS[f].tier);}
-
-  // Rank select
-  function buildRankSelect(cid, ini, onChange){
-    const container=$(cid); let cur=ini;
-    const ARROW=`<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
-    const getLabel=i=>`${rankIcon(RANKS[i].tier)} <span class="cs-label">${RANKS[i].label}</span>`;
-    const trigger=document.createElement("div"); trigger.className="cs-trigger";
-    trigger.innerHTML=getLabel(cur)+ARROW;
-    const dropdown=document.createElement("div"); dropdown.className="cs-dropdown";
-    let lastTier=null;
-    RANKS.forEach((rank,idx)=>{
-      if(rank.tier!==lastTier){
-        const h=document.createElement("div"); h.className="cs-group-header";
-        h.innerHTML=`<span style="color:${TIER_META[rank.tier].color}">${TIER_META[rank.tier].label}</span>`;
-        dropdown.appendChild(h); lastTier=rank.tier;
-      }
-      const opt=document.createElement("div");
-      opt.className="cs-option"+(idx===cur?" selected":""); opt.dataset.idx=idx;
-      opt.innerHTML=`${rankIcon(rank.tier,18)} ${rank.label}`;
-      opt.addEventListener("click",()=>{
-        cur=idx; trigger.innerHTML=getLabel(cur)+ARROW;
-        dropdown.querySelectorAll(".cs-option").forEach(o=>o.classList.toggle("selected",+o.dataset.idx===cur));
-        container.classList.remove("open"); onChange(cur);
-      });
+  function refreshDropdown() {
+    dropdown.innerHTML = '';
+    const h1 = document.createElement('div'); h1.className = 'cs-group-header';
+    h1.innerHTML = '<span style="color:var(--dim)">Role Queue</span>'; dropdown.appendChild(h1);
+    ROLES.filter(r => r.group === 'main').forEach(role => {
+      const opt = document.createElement('div');
+      opt.className = 'cs-option' + (curRole === role.value ? ' selected' : '');
+      opt.innerHTML = role.label + sfx(role.value);
+      opt.addEventListener('click', () => { curRole = role.value; container.classList.remove('open'); refreshAll(); onChange && onChange(curRole); });
       dropdown.appendChild(opt);
     });
-    trigger.addEventListener("click",e=>{
-      e.stopPropagation();
-      const was=container.classList.contains("open");
-      document.querySelectorAll(".custom-select.open").forEach(el=>el.classList.remove("open"));
-      if(!was){container.classList.add("open");dropdown.querySelector(".selected")?.scrollIntoView({block:"nearest"});}
-    });
-    container.appendChild(trigger); container.appendChild(dropdown);
-    return{setIdx(idx){cur=idx;trigger.innerHTML=getLabel(cur)+ARROW;dropdown.querySelectorAll(".cs-option").forEach(o=>o.classList.toggle("selected",+o.dataset.idx===cur));}};
-  }
-
-  // Role select — Open Q separated
-  function buildRoleSelect(cid){
-    const container=$(cid);
-    const ARROW=`<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
-    const trigger=document.createElement("div"); trigger.className="cs-trigger";
-    const dropdown=document.createElement("div"); dropdown.className="cs-dropdown";
-
-    const sfx=role=>{const m=isDuo?role.duo:role.solo;return m!==1?` <span style="color:#6c8fff;font-size:10px">+${Math.round((m-1)*100)}%</span>`:""};
-
-    function refresh(){
-      dropdown.innerHTML="";
-      // Main roles header
-      const h1=document.createElement("div"); h1.className="cs-group-header";
-      h1.innerHTML=`<span style="color:var(--dim)">Role Queue</span>`; dropdown.appendChild(h1);
-      ROLES.filter(r=>r.group==="main").forEach(role=>{
-        const opt=document.createElement("div");
-        opt.className="cs-option"+(role.value===roleVal?" selected":"");
-        opt.innerHTML=role.label+sfx(role);
-        opt.addEventListener("click",()=>{roleVal=role.value;container.classList.remove("open");refreshTrigger();refresh();render();});
-        dropdown.appendChild(opt);
-      });
-      // Divider + 6v6
-      const div=document.createElement("div"); div.className="cs-divider"; dropdown.appendChild(div);
-      ROLES.filter(r=>r.group==="mode").forEach(role=>{
-        const opt=document.createElement("div");
-        opt.className="cs-option"+(role.value===roleVal?" selected":"");
-        opt.innerHTML=role.label+sfx(role);
-        opt.addEventListener("click",()=>{roleVal=role.value;container.classList.remove("open");refreshTrigger();refresh();render();});
-        dropdown.appendChild(opt);
-      });
-    }
-
-    function refreshTrigger(){
-      const r=ROLES.find(r=>r.value===roleVal);
-      trigger.innerHTML=`<span class="cs-label">${r.label}${sfx(r)}</span>${ARROW}`;
-    }
-
-    trigger.addEventListener("click",e=>{
-      e.stopPropagation();
-      const was=container.classList.contains("open");
-      document.querySelectorAll(".custom-select.open").forEach(el=>el.classList.remove("open"));
-      if(!was)container.classList.add("open");
-    });
-    refreshTrigger(); refresh();
-    container.appendChild(trigger); container.appendChild(dropdown);
-    return{refresh,refreshTrigger};
-  }
-
-  // Pct slider
-  function buildPctSlider(trackId,thumbId,fillId,valId,getPosPct,onChange){
-    const track=$(trackId),thumb=$(thumbId),fill=$(fillId),valEl=$(valId);
-    let val=0,dragging=false;
-    function paint(v){
-      const col=gradientColor(getPosPct());
-      fill.style.width=v+"%";
-      fill.style.background=col;
-      fill.style.opacity="0.8";
-      thumb.style.left=v+"%";
-      thumb.style.background=col;
-      valEl.textContent=v+"%";
-      valEl.style.color=col;
-    }
-    function setVal(v,silent){val=Math.max(0,Math.min(99,Math.round(v)));paint(val);if(!silent)onChange(val);}
-    function fromCX(cx){const rect=track.getBoundingClientRect();return((cx-rect.left)/rect.width)*99;}
-    track.addEventListener("click",e=>{e.stopPropagation();setVal(fromCX(e.clientX));});
-    thumb.addEventListener("mousedown",e=>{dragging=true;thumb.classList.add("dragging");e.preventDefault();e.stopPropagation();});
-    document.addEventListener("mousemove",e=>{if(dragging)setVal(fromCX(e.clientX));});
-    document.addEventListener("mouseup",()=>{if(dragging){dragging=false;thumb.classList.remove("dragging");}});
-    thumb.addEventListener("touchstart",e=>{dragging=true;thumb.classList.add("dragging");e.preventDefault();},{passive:false});
-    document.addEventListener("touchmove",e=>{if(dragging)setVal(fromCX(e.touches[0].clientX));},{passive:true});
-    document.addEventListener("touchend",()=>{if(dragging){dragging=false;thumb.classList.remove("dragging");}});
-    setVal(0,true);
-    return{setVal,getVal:()=>val,repaint:()=>paint(val)};
-  }
-
-  // Progress bar
-  function buildTierTicks(){
-    const track=$("progressTrack");
-    RANKS.forEach((rank, idx) => {
-      if (idx === 0) return;
-      const isTierBoundary = rank.div === 5;
-      const tick = document.createElement("div");
-      tick.className = "progress-tick";
-      tick.style.left = idxToPct(idx) + "%";
-      tick.style.opacity = isTierBoundary ? "0.7" : "0.25";
-      tick.style.width = isTierBoundary ? "2px" : "1px";
-      track.insertBefore(tick, track.firstChild);
-    });
-  }
-  function buildProgressLabels(){
-    const el=$("progressLabels");
-    TIERS.forEach(tier => {
-      const div3idx = RANKS.findIndex(r => r.tier === tier && r.div === 3);
-      const div2idx = RANKS.findIndex(r => r.tier === tier && r.div === 2);
-      const cp = (idxToPct(div3idx) + idxToPct(div2idx)) / 2;
-      const span = document.createElement("span");
-      span.textContent = tier === "grandmaster" ? "GM" : tier.slice(0,2).toUpperCase();
-      span.style.left = cp + "%";
-      span.style.color = TIER_META[tier].color;
-      el.appendChild(span);
+    const div = document.createElement('div'); div.className = 'cs-divider'; dropdown.appendChild(div);
+    [...ROLES.filter(r => r.group === 'mode'), ...extraValues.map(v => ({value:v.value, label:v.label}))].forEach(role => {
+      const opt = document.createElement('div');
+      opt.className = 'cs-option' + (curRole === role.value ? ' selected' : '');
+      opt.innerHTML = role.label + (ROLES.find(r=>r.value===role.value) ? sfx(role.value) : '');
+      opt.addEventListener('click', () => { curRole = role.value; container.classList.remove('open'); refreshAll(); onChange && onChange(curRole); });
+      dropdown.appendChild(opt);
     });
   }
 
-  function updateProgress(){
-    const fp=idxToPct(fromIdx),tp=idxToPct(toIdx);
-    $("progressFill").style.left=fp+"%";
-    $("progressFill").style.width=(tp-fp)+"%";
-    $("progressFill").style.backgroundPositionX=`-${(fp/100)*500}px`;
-    $("dotFrom").style.left=fp+"%"; $("dotFrom").style.background=gradientColor(fp);
-    $("dotTo").style.left=tp+"%";   $("dotTo").style.background=gradientColor(tp);
-    $("tipFrom").textContent=RANKS[fromIdx].label;
-    $("tipTo").textContent=RANKS[toIdx].label;
-    // Update prog-names header
-    $("progFrom").textContent=RANKS[fromIdx].label;
-    $("progTo").textContent=RANKS[toIdx].label;
-    sliderFrom.repaint(); sliderTo.repaint();
+  function refreshTrigger() {
+    const role = ROLES.find(r => r.value === curRole);
+    const label = role ? role.label : (extraValues.find(v => v.value === curRole)?.label || curRole);
+    trigger.innerHTML = `<span class="cs-label">${label}${role ? sfx(curRole) : ''}</span>${ARROW_SVG}`;
   }
 
-  function render(){
-    updateProgress(); csFrom.setIdx(fromIdx); csTo.setIdx(toIdx);
+  function refreshAll() { refreshTrigger(); refreshDropdown(); }
 
-    const out=$("priceOutput");
-    if(toIdx<=fromIdx){
-      out.textContent="Select a higher rank"; out.className="price-val error";
-      $("priceOriginal").textContent="";
-      const b=$("priceBadge");b.textContent="";b.classList.remove("active");return;
-    }
-    const base=calcBase(fromIdx,toIdx,pctFrom,pctTo);
-    const noDisc=applyMults(base);
-    const dr=DISCOUNT[Math.min(tiersSpanned(fromIdx,toIdx),DISCOUNT.length-1)];
-    const final=noDisc*(1-dr);
-    out.className="price-val";
-    const newPrice = "$"+final.toFixed(2);
-    if (out.textContent !== newPrice) {
-      out.textContent = newPrice;
-    }
-    // Update duo surcharge badge
-    const surcharge = duoSurcharge();
-    const extraEl = $("duoExtra");
-    if (surcharge > 0) {
-      extraEl.textContent = "+" + surcharge + "%";
-      extraEl.style.opacity = "1";
-      extraEl.style.transform = "translateY(0)";
-    } else {
-      extraEl.style.opacity = "0";
-      extraEl.style.transform = "translateY(4px)";
-    }
+  attachTriggerClick(container, trigger);
+  refreshAll();
+  container.appendChild(trigger); container.appendChild(dropdown);
+  return { getRole: () => curRole, setRole: r => { curRole = r; refreshAll(); }, refreshAll };
+}
 
-    const b=$("priceBadge");
-    if(dr>0){
-      $("priceOriginal").textContent="$"+noDisc.toFixed(2);
-      b.textContent=`Save $${(noDisc-final).toFixed(2)} · ${dr*100}% off`;
-      b.classList.add("active");
-    } else {
-      $("priceOriginal").textContent=""; b.textContent=""; b.classList.remove("active");
-    }
+// ─── TIER SELECT (generic for pl/drives) ─────────────────────────────────────
+function buildTierSelect(cid, tiers, tierMeta, getExtra, onSelect) {
+  const container = $(cid);
+  const trigger = buildTrigger();
+  const dropdown = buildDropdown();
+  let curTier = tiers[0];
+
+  function iconHtml(tier, size = 20) {
+    const m = tierMeta[tier];
+    return `<span class="rank-icon" style="width:${size}px;height:${size}px;background:${m.bg};color:${m.color};font-size:${Math.round(size*.44)}px">${m.symbol}</span>`;
   }
-
-  function makeDraggable(dotEl,isFrom){
-    let dragging=false;
-    function onMove(cx){
-      const rect=$("progressTrack").getBoundingClientRect();
-      const raw=Math.round(Math.max(0,Math.min(1,(cx-rect.left)/rect.width))*(TOTAL-1));
-      if(isFrom){const nf=Math.min(raw,TOTAL-2);if(nf>=toIdx)toIdx=Math.min(nf+1,TOTAL-1);fromIdx=nf;}
-      else{const nt=Math.max(raw,1);if(nt<=fromIdx)fromIdx=Math.max(nt-1,0);toIdx=nt;}
-      render();
-    }
-    dotEl.addEventListener("mousedown",e=>{dragging=true;dotEl.classList.add("dragging");e.preventDefault();});
-    document.addEventListener("mousemove",e=>{if(dragging)onMove(e.clientX);});
-    document.addEventListener("mouseup",()=>{if(dragging){dragging=false;dotEl.classList.remove("dragging");}});
-    dotEl.addEventListener("touchstart",e=>{dragging=true;dotEl.classList.add("dragging");e.preventDefault();},{passive:false});
-    document.addEventListener("touchmove",e=>{if(dragging)onMove(e.touches[0].clientX);},{passive:true});
-    document.addEventListener("touchend",()=>{if(dragging){dragging=false;dotEl.classList.remove("dragging");}});
+  function getLabel(tier) {
+    return `${iconHtml(tier)} <span class="cs-label">${tierMeta[tier].label}${getExtra ? ' — ' + getExtra(tier) : ''}</span>`;
   }
+  trigger.innerHTML = getLabel(curTier) + ARROW_SVG;
 
-  function copyOrder(){
-    const priceEl=$("priceOutput");
-    if(!priceEl||priceEl.classList.contains("error"))return;
-    const price=priceEl.textContent;
-    const role=ROLES.find(r=>r.value===roleVal);
-    const opts=[];
-    if(isDuo)opts.push("Duo Boost");
-    if($("stream").checked)opts.push("Stream");
-    if($("offline").checked)opts.push("Offline Mode");
-    if($("vpn").checked)opts.push("VPN");
-    if($("rankPs").checked)opts.push("PlayStation +50%");
-    const text=["🎮 Overwatch Boost Order","─────────────────────",
+  tiers.forEach(tier => {
+    const opt = document.createElement('div');
+    opt.className = 'cs-option' + (tier === curTier ? ' selected' : '');
+    opt.dataset.tier = tier;
+    opt.innerHTML = `${iconHtml(tier, 18)} ${tierMeta[tier].label}${getExtra ? ' — ' + getExtra(tier) : ''}`;
+    opt.addEventListener('click', () => {
+      curTier = tier; trigger.innerHTML = getLabel(curTier) + ARROW_SVG;
+      dropdown.querySelectorAll('.cs-option').forEach(o => o.classList.toggle('selected', o.dataset.tier === tier));
+      container.classList.remove('open'); onSelect(curTier);
+    });
+    dropdown.appendChild(opt);
+  });
+
+  attachTriggerClick(container, trigger);
+  container.appendChild(trigger); container.appendChild(dropdown);
+}
+
+// ─── PROGRESS BAR ────────────────────────────────────────────────────────────
+function buildTierTicks() {
+  const track = $('progressTrack');
+  RANKS.forEach((rank, idx) => {
+    if (idx === 0) return;
+    const tick = document.createElement('div'); tick.className = 'progress-tick';
+    tick.style.left = idxToPct(idx) + '%';
+    tick.style.opacity = rank.div === 5 ? '0.7' : '0.25';
+    tick.style.width = rank.div === 5 ? '2px' : '1px';
+    track.insertBefore(tick, track.firstChild);
+  });
+}
+
+function buildProgressLabels() {
+  const el = $('progressLabels');
+  TIERS.forEach(tier => {
+    const div3idx = RANKS.findIndex(r => r.tier === tier && r.div === 3);
+    const div2idx = RANKS.findIndex(r => r.tier === tier && r.div === 2);
+    const cp = (idxToPct(div3idx) + idxToPct(div2idx)) / 2;
+    const span = document.createElement('span');
+    span.textContent = tier === 'grandmaster' ? 'GM' : tier.slice(0,2).toUpperCase();
+    span.style.left = cp + '%'; span.style.color = TIER_META[tier].color;
+    el.appendChild(span);
+  });
+}
+
+function updateProgress() {
+  const fp = idxToPct(fromIdx), tp = idxToPct(toIdx);
+  $('progressFill').style.left = fp + '%';
+  $('progressFill').style.width = (tp - fp) + '%';
+  $('progressFill').style.backgroundPositionX = `-${(fp / 100) * 500}px`;
+  $('dotFrom').style.left = fp + '%'; $('dotFrom').style.background = gradientColor(fp);
+  $('dotTo').style.left = tp + '%';   $('dotTo').style.background = gradientColor(tp);
+  $('tipFrom').textContent = RANKS[fromIdx].label;
+  $('tipTo').textContent = RANKS[toIdx].label;
+  $('progFrom').textContent = RANKS[fromIdx].label;
+  $('progTo').textContent = RANKS[toIdx].label;
+  sliderFrom.repaint(); sliderTo.repaint();
+}
+
+function buildProgressDrag() {
+  const track = $('progressTrack');
+  function onMove(cx, isFrom) {
+    const rect = track.getBoundingClientRect();
+    const raw = Math.round(Math.max(0, Math.min(1, (cx - rect.left) / rect.width)) * (TOTAL - 1));
+    if (isFrom) { fromIdx = Math.min(raw, TOTAL-2); if (fromIdx >= toIdx) toIdx = Math.min(fromIdx+1, TOTAL-1); }
+    else { toIdx = Math.max(raw, 1); if (toIdx <= fromIdx) fromIdx = Math.max(toIdx-1, 0); }
+    render();
+  }
+  makeDraggable1D($('dotFrom'), x => onMove(x, true), x => x);
+  makeDraggable1D($('dotTo'), x => onMove(x, false), x => x);
+
+  // Segment drag
+  let dragSeg = false, segStartX = 0, segStartFrom = 0, segStartTo = 0;
+  track.addEventListener('mousedown', e => {
+    const fp = idxToPct(fromIdx)/100, tp = idxToPct(toIdx)/100;
+    const r = track.getBoundingClientRect(); const pos = (e.clientX - r.left) / r.width;
+    if (pos > fp + .02 && pos < tp - .02) { dragSeg = true; segStartX = e.clientX; segStartFrom = fromIdx; segStartTo = toIdx; e.preventDefault(); }
+  });
+  track.addEventListener('touchstart', e => {
+    const fp = idxToPct(fromIdx)/100, tp = idxToPct(toIdx)/100;
+    const r = track.getBoundingClientRect(); const pos = (e.touches[0].clientX - r.left) / r.width;
+    if (pos > fp + .02 && pos < tp - .02) { dragSeg = true; segStartX = e.touches[0].clientX; segStartFrom = fromIdx; segStartTo = toIdx; e.preventDefault(); }
+  }, {passive:false});
+  function onSeg(cx) {
+    if (!dragSeg) return;
+    const r = track.getBoundingClientRect();
+    const delta = Math.round(((cx - segStartX) / r.width) * (TOTAL - 1));
+    let nf = segStartFrom + delta, nt = segStartTo + delta;
+    if (nf < 0) { nt -= nf; nf = 0; } if (nt > TOTAL-1) { nf -= nt-(TOTAL-1); nt = TOTAL-1; }
+    fromIdx = Math.max(0, nf); toIdx = Math.min(TOTAL-1, nt); render();
+  }
+  document.addEventListener('mousemove', e => onSeg(e.clientX));
+  document.addEventListener('touchmove', e => onSeg(e.touches[0].clientX), {passive:true});
+  document.addEventListener('mouseup', () => { dragSeg = false; });
+  document.addEventListener('touchend', () => { dragSeg = false; });
+}
+
+// ─── PCT SLIDER ───────────────────────────────────────────────────────────────
+function buildPctSlider(trackId, thumbId, fillId, valId, getPosPct, onChange) {
+  const track=$(trackId), thumb=$(thumbId), fill=$(fillId), valEl=$(valId);
+  let val = 0;
+  function paint(v) {
+    const col = gradientColor(getPosPct());
+    fill.style.width = v + '%'; fill.style.background = col; fill.style.opacity = '.8';
+    thumb.style.left = v + '%'; thumb.style.background = col;
+    valEl.textContent = v + '%'; valEl.style.color = col;
+  }
+  function setVal(v, silent) { val = Math.max(0, Math.min(99, Math.round(v))); paint(val); if (!silent) onChange(val); }
+  function fromCX(cx) { const r = track.getBoundingClientRect(); return ((cx - r.left) / r.width) * 99; }
+  track.addEventListener('click', e => { e.stopPropagation(); setVal(fromCX(e.clientX)); });
+  makeDraggable1D(thumb, x => setVal(fromCX(x)), x => x);
+  setVal(0, true);
+  return { setVal, getVal: () => val, repaint: () => paint(val) };
+}
+
+// ─── MODE SWITCHER ────────────────────────────────────────────────────────────
+const PANELS = {rank:'rankPanel', placement:'placementPanel', battlepass:'bpPanel', drives:'drPanel'};
+const TITLES = {rank:'Rank Boost', placement:'Placements', battlepass:'Battle Pass', drives:'Drives'};
+
+function switchMode(mode) {
+  Object.values(PANELS).forEach(id => $(id).classList.remove('active'));
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  $(PANELS[mode]).classList.add('active');
+  const btns = document.querySelectorAll('.mode-btn');
+  const modeOrder = ['rank','placement','battlepass','drives'];
+  btns[modeOrder.indexOf(mode)]?.classList.add('active');
+  $('bannerMode').textContent = TITLES[mode] || 'Boost';
+}
+
+// ─── PLACEMENTS LOGIC ─────────────────────────────────────────────────────────
+function renderPl() {
+  const pricePerWin = WIN_PRICE[plTier] || 1;
+  let total = pricePerWin * plGames * 0.7;
+  if (plMethod === 'duo') total *= 1.70;
+  if ($('plStream').checked) total *= 1.05;
+  if ($('plPs').checked) total *= 1.50;
+  const role = ROLES.find(r => r.value === plRole);
+  if (role) total *= plMethod === 'duo' ? role.duo : role.solo;
+  $('plOutput').textContent = '$' + total.toFixed(2);
+  $('plOutput').className = 'price-val';
+  const badge = $('plBadge');
+  badge.textContent = plMethod === 'pilot' ? `~${Math.round(plGames*.7)} wins guaranteed` : `~${Math.round(plGames*.7)} wins expected`;
+  badge.classList.add('active');
+  $('plOriginal').textContent = '';
+}
+
+function setMethod(m) {
+  plMethod = m;
+  $('methodPilot').classList.toggle('active', m === 'pilot');
+  $('methodDuo').classList.toggle('active', m === 'duo');
+  $('csPlRole').innerHTML = '';
+  plRoleCtrl = buildRoleSelect('csPlRole', {isDuoFn: () => plMethod === 'duo', onChange: rv => { plRole = rv; renderPl(); }});
+  renderPl();
+}
+
+// ─── BATTLE PASS LOGIC ────────────────────────────────────────────────────────
+function bpLevelPrice(n) { return BP_BASE * Math.pow(BP_R, n - 1); }
+function bpRangePrice(from, to) { let t = 0; for (let i = from; i < to; i++) t += bpLevelPrice(i); return t; }
+function bpDiscount(levels) {
+  if (levels >= 150) return 0.20; if (levels >= 100) return 0.15;
+  if (levels >= 50) return 0.10; if (levels >= 25) return 0.05; return 0;
+}
+
+function renderBp() {
+  const from = Math.max(1, Math.min(199, parseInt($('bpFrom').value) || 1));
+  const to   = Math.max(from + 1, Math.min(200, parseInt($('bpTo').value) || 200));
+  const levels = to - from;
+  const disc = bpDiscount(levels);
+  const base = bpRangePrice(from, to);
+  let total = base * (1 - disc);
+  if (bpRole === 'lock') total *= 1.10;
+  if ($('bpStream').checked) total *= 1.05;
+  if ($('bpPs').checked) total *= 1.50;
+  $('bpOutput').textContent = '$' + total.toFixed(2);
+  $('bpOutput').className = 'price-val';
+  const badge = $('bpBadge');
+  badge.classList.add('active');
+  if (disc > 0) {
+    let noDiscTotal = base; if (bpRole==='lock') noDiscTotal*=1.10; if($('bpStream').checked) noDiscTotal*=1.05; if($('bpPs').checked) noDiscTotal*=1.50;
+    $('bpOriginal').textContent = '$' + noDiscTotal.toFixed(2);
+    badge.textContent = `${disc*100}% off · ${levels} levels`;
+  } else {
+    $('bpOriginal').textContent = ''; badge.textContent = `${levels} levels`;
+  }
+}
+
+function setBpRole(r) {
+  bpRole = r;
+  $('bpRoleAny').classList.toggle('active', r === 'any');
+  $('bpRoleLock').classList.toggle('active', r === 'lock');
+  $('bpRoleLockField').style.display = r === 'lock' ? 'block' : 'none';
+  renderBp();
+}
+
+function buildBpRoleSelect() {
+  const container = $('csBpRole');
+  const trigger = buildTrigger();
+  const dropdown = buildDropdown();
+  const roleLabels = {tank:'Tank', dd:'DD', support:'Support'};
+  function refreshT() { trigger.innerHTML = `<span class="cs-label">${roleLabels[bpPreferredRole]}</span>${ARROW_SVG}`; }
+  Object.entries(roleLabels).forEach(([val, label]) => {
+    const opt = document.createElement('div');
+    opt.className = 'cs-option' + (val === bpPreferredRole ? ' selected' : '');
+    opt.textContent = label;
+    opt.addEventListener('click', () => {
+      bpPreferredRole = val;
+      dropdown.querySelectorAll('.cs-option').forEach(o => o.classList.toggle('selected', o.textContent === label));
+      container.classList.remove('open'); refreshT(); renderBp();
+    });
+    dropdown.appendChild(opt);
+  });
+  attachTriggerClick(container, trigger);
+  refreshT(); container.appendChild(trigger); container.appendChild(dropdown);
+}
+
+// ─── DRIVES LOGIC ─────────────────────────────────────────────────────────────
+function renderDr() {
+  const from = Math.max(0, Math.min(3999, parseInt($('drFrom').value) || 0));
+  const to   = Math.max(from + 1, Math.min(4000, parseInt($('drTo').value) || 4000));
+  const range = to - from;
+  const drDuo = $('drDuo').checked;
+  let total = (DRIVE_PRICE[drTier] / 4000) * range;
+  if (drDuo) total *= 1.50;
+  if ($('drStream').checked) total *= 1.05;
+  if ($('drPs').checked) total *= 1.50;
+  if (drRoleVal !== 'any') {
+    const role = ROLES.find(r => r.value === drRoleVal);
+    if (role) total *= drDuo ? role.duo : role.solo;
+  }
+  $('drRangeLabel').textContent = `${range} points (${Math.round(range/4000*100)}% of full drive)`;
+  $('drOutput').textContent = '$' + total.toFixed(2); $('drOutput').className = 'price-val';
+  $('drBadge').textContent = `$${(DRIVE_PRICE[drTier]/4000).toFixed(3)}/pt`; $('drBadge').classList.add('active');
+  $('drOriginal').textContent = '';
+}
+
+// ─── COPY HANDLERS ────────────────────────────────────────────────────────────
+function getCopyText(mode) {
+  const line = '─────────────────────';
+  if (mode === 'rank') {
+    const priceEl = $('priceOutput');
+    if (!priceEl || priceEl.classList.contains('error')) return null;
+    const role = ROLES.find(r => r.value === roleVal);
+    const opts = [];
+    if ($('duoBoost').checked) opts.push('Duo Boost');
+    if ($('stream').checked) opts.push('Stream');
+    if ($('offline').checked) opts.push('Offline Mode');
+    if ($('vpn').checked) opts.push('VPN');
+    if ($('rankPs').checked) opts.push('PlayStation +50%');
+    return ['🎮 Overwatch Boost Order', line,
       `From:    ${RANKS[fromIdx].label} (${pctFrom}%)`,
       `To:      ${RANKS[toIdx].label} (${pctTo}%)`,
       `Role:    ${role.label}`,
-      opts.length?`Options: ${opts.join(", ")}`:null,
-      "─────────────────────",`Total:   ${price}`
-    ].filter(Boolean).join("\n");
-    const btn=$("copyBtn");
-    const IC=`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
-    const CK=`<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-    function showCopied(){btn.classList.add("copied");btn.innerHTML=CK+" Copied!";setTimeout(()=>{btn.classList.remove("copied");btn.innerHTML=IC+" Copy Order";},2000);}
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(showCopied).catch(()=>fallbackCopy(text,showCopied));}
-    else fallbackCopy(text,showCopied);
+      opts.length ? `Options: ${opts.join(', ')}` : null,
+      line, `Total:   ${priceEl.textContent}`
+    ].filter(Boolean).join('\n');
   }
-  function fallbackCopy(text,cb){
-    const ta=document.createElement("textarea");
-    ta.value=text;ta.style.cssText="position:fixed;top:-9999px;opacity:0";
-    document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,99999);
-    try{document.execCommand("copy");cb();}catch(e){}
-    document.body.removeChild(ta);
-  }
-
-  const csFrom=buildRankSelect("csFrom",fromIdx,idx=>{
-    fromIdx=idx;
-    if(toIdx<=fromIdx)toIdx=Math.min(fromIdx+1,TOTAL-1);
-    render();
-    // pulse trigger
-    const t=$("csFrom").querySelector(".cs-trigger");
-    if(t){t.classList.remove("pulse");void t.offsetWidth;t.classList.add("pulse");setTimeout(()=>t.classList.remove("pulse"),400);}
-  });
-  const csTo=buildRankSelect("csTo",toIdx,idx=>{
-    toIdx=idx;
-    if(fromIdx>=toIdx)fromIdx=Math.max(toIdx-1,0);
-    render();
-    const t=$("csTo").querySelector(".cs-trigger");
-    if(t){t.classList.remove("pulse");void t.offsetWidth;t.classList.add("pulse");setTimeout(()=>t.classList.remove("pulse"),400);}
-  });
-  const csRole=buildRoleSelect("csRole");
-  const sliderFrom=buildPctSlider("pctFromTrack","pctFromThumb","pctFromFill","pctFromVal",()=>idxToPct(fromIdx),v=>{pctFrom=v;render();});
-  const sliderTo=buildPctSlider("pctToTrack","pctToThumb","pctToFill","pctToVal",()=>idxToPct(toIdx),v=>{pctTo=v;render();});
-  buildProgressLabels(); buildTierTicks();
-  makeDraggable($("dotFrom"),true); makeDraggable($("dotTo"),false);
-  function addToggleBounce(id) {
-    const el = $(id).closest ? $(id).parentElement : $(id);
-    // find the label
-    const label = $(id).closest ? document.querySelector(`label:has(#${id})`) : null;
-    $(id).addEventListener("change", () => {
-      if (label) {
-        label.classList.remove("bounce");
-        void label.offsetWidth;
-        label.classList.add("bounce");
-        setTimeout(() => label.classList.remove("bounce"), 300);
-      }
-    });
-  }
-  ["duoBoost","stream","offline","vpn"].forEach(addToggleBounce);
-
-  // Rank Map — drag segment to move whole range
-  (function() {
-    const track = $("progressTrack");
-    let dragSeg = false, segStartX = 0, segStartFrom = 0, segStartTo = 0;
-    track.addEventListener("mousedown", e => {
-      const fp = idxToPct(fromIdx) / 100, tp = idxToPct(toIdx) / 100;
-      const r = track.getBoundingClientRect();
-      const pos = (e.clientX - r.left) / r.width;
-      if (pos > fp + 0.02 && pos < tp - 0.02) {
-        dragSeg = true; segStartX = e.clientX;
-        segStartFrom = fromIdx; segStartTo = toIdx; e.preventDefault();
-      }
-    });
-    document.addEventListener("mousemove", e => {
-      if (!dragSeg) return;
-      const r = track.getBoundingClientRect();
-      const delta = Math.round(((e.clientX - segStartX) / r.width) * (TOTAL - 1));
-      let nf = segStartFrom + delta, nt = segStartTo + delta;
-      if (nf < 0) { nt -= nf; nf = 0; }
-      if (nt > TOTAL - 1) { nf -= nt - (TOTAL - 1); nt = TOTAL - 1; }
-      fromIdx = Math.max(0, nf); toIdx = Math.min(TOTAL - 1, nt); render();
-    });
-    document.addEventListener("mouseup", () => { dragSeg = false; });
-    track.addEventListener("touchstart", e => {
-      const fp = idxToPct(fromIdx) / 100, tp = idxToPct(toIdx) / 100;
-      const r = track.getBoundingClientRect();
-      const pos = (e.touches[0].clientX - r.left) / r.width;
-      if (pos > fp + 0.02 && pos < tp - 0.02) {
-        dragSeg = true; segStartX = e.touches[0].clientX;
-        segStartFrom = fromIdx; segStartTo = toIdx; e.preventDefault();
-      }
-    }, {passive:false});
-    document.addEventListener("touchmove", e => {
-      if (!dragSeg) return;
-      const r = track.getBoundingClientRect();
-      const delta = Math.round(((e.touches[0].clientX - segStartX) / r.width) * (TOTAL - 1));
-      let nf = segStartFrom + delta, nt = segStartTo + delta;
-      if (nf < 0) { nt -= nf; nf = 0; }
-      if (nt > TOTAL - 1) { nf -= nt - (TOTAL - 1); nt = TOTAL - 1; }
-      fromIdx = Math.max(0, nf); toIdx = Math.min(TOTAL - 1, nt); render();
-    }, {passive:true});
-    document.addEventListener("touchend", () => { dragSeg = false; });
-  })();
-
-  $("duoBoost").addEventListener("change",()=>{isDuo=$("duoBoost").checked;csRole.refreshTrigger();csRole.refresh();render();});
-  $("stream").addEventListener("change",render);
-  $("rankPs").addEventListener("change",render);
-  $("copyBtn").addEventListener("click",copyOrder);
-  $("orderBtn").addEventListener("click", () => {
-    window.open("https://discord.gg/aP6vKM5e", "_blank");
-  });
-  document.addEventListener("click",()=>document.querySelectorAll(".custom-select.open").forEach(el=>el.classList.remove("open")));
-  render();
-
-  // ── PLACEMENTS MODE ──────────────────────────────────────────────────────
-  // Price per win = stepPrice of div5 in that tier (same as one division step)
-  const WIN_PRICE = {
-    unranked:    0.30,
-    bronze:      0.45,
-    silver:      0.95,
-    gold:        1.47,
-    platinum:    2.25,
-    diamond:     4.25,
-    master:      6.50,
-    grandmaster: 12.50,
-  };
-  const PL_TIERS = ["unranked", ...TIERS];
-  const PL_TIER_META = {
-    unranked: {label:"Unranked", color:"#6a7080", bg:"rgba(106,112,128,0.18)", symbol:"?"},
-    ...TIER_META
-  };
-
-  let plTier   = "gold";
-  let plGames  = 5;
-
-  let plMethod = "pilot"; // "pilot" | "duo"
-  let plRole   = "tank";
-
-  // Build placement tier select
-  function buildPlTierSelect() {
-    const container = $("csPlTier");
-    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
-    const trigger = document.createElement("div"); trigger.className = "cs-trigger";
-    const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
-
-    function getLabel(tier) {
-      const m = PL_TIER_META[tier];
-      return `<span class="rank-icon" style="width:20px;height:20px;background:${m.bg};color:${m.color};font-size:9px">${m.symbol}</span> <span class="cs-label">${m.label}</span>`;
-    }
-    trigger.innerHTML = getLabel(plTier) + ARROW;
-
-    PL_TIERS.forEach(tier => {
-      const opt = document.createElement("div");
-      opt.className = "cs-option" + (tier === plTier ? " selected" : "");
-      const m = PL_TIER_META[tier];
-      opt.dataset.tier = tier;
-      opt.innerHTML = `<span class="rank-icon" style="width:18px;height:18px;background:${m.bg};color:${m.color};font-size:8px">${m.symbol}</span> ${m.label}`;
-      opt.addEventListener("click", () => {
-        plTier = tier;
-        trigger.innerHTML = getLabel(plTier) + ARROW;
-        dropdown.querySelectorAll(".cs-option").forEach(o => o.classList.toggle("selected", o.dataset.tier === tier));
-        container.classList.remove("open");
-        renderPl();
-      });
-      dropdown.appendChild(opt);
-    });
-
-    trigger.addEventListener("click", e => {
-      e.stopPropagation();
-      const was = container.classList.contains("open");
-      document.querySelectorAll(".custom-select.open").forEach(el => el.classList.remove("open"));
-      if (!was) container.classList.add("open");
-    });
-    container.appendChild(trigger);
-    container.appendChild(dropdown);
-  }
-
-  // Build placement role select
-  function buildPlRoleSelect() {
-    const container = $("csPlRole");
-    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
-    const trigger = document.createElement("div"); trigger.className = "cs-trigger";
-    const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
-
-    function roleSfx(rv) {
-      const role = ROLES.find(r => r.value === rv);
-      const mult = plMethod === "duo" ? role.duo : role.solo;
-      return mult !== 1 ? ` <span style="color:#6c8fff;font-size:10px">+${Math.round((mult-1)*100)}%</span>` : "";
-    }
-
-    function refresh() {
-      dropdown.innerHTML = "";
-      const h1 = document.createElement("div"); h1.className = "cs-group-header";
-      h1.innerHTML = `<span style="color:var(--dim)">Role Queue</span>`; dropdown.appendChild(h1);
-      ["tank","dd","support"].forEach(rv => {
-        const role = ROLES.find(r => r.value === rv);
-        const opt = document.createElement("div");
-        opt.className = "cs-option" + (plRole === rv ? " selected" : "");
-        opt.innerHTML = role.label + roleSfx(rv);
-        opt.addEventListener("click", () => { plRole = rv; container.classList.remove("open"); refreshTrigger(); refresh(); renderPl(); });
-        dropdown.appendChild(opt);
-      });
-      const div = document.createElement("div"); div.className = "cs-divider"; dropdown.appendChild(div);
-      const openq = ROLES.find(r => r.value === "openq");
-      const opt = document.createElement("div");
-      opt.className = "cs-option" + (plRole === "openq" ? " selected" : "");
-      opt.innerHTML = openq.label + roleSfx("openq");
-      opt.addEventListener("click", () => { plRole = "openq"; container.classList.remove("open"); refreshTrigger(); refresh(); renderPl(); });
-      dropdown.appendChild(opt);
-    }
-    function refreshTrigger() {
-      const role = ROLES.find(r => r.value === plRole);
-      trigger.innerHTML = `<span class="cs-label">${role.label}${roleSfx(plRole)}</span>${ARROW}`;
-    }
-    trigger.addEventListener("click", e => {
-      e.stopPropagation();
-      const was = container.classList.contains("open");
-      document.querySelectorAll(".custom-select.open").forEach(el => el.classList.remove("open"));
-      if (!was) container.classList.add("open");
-    });
-    refreshTrigger(); refresh();
-    container.appendChild(trigger); container.appendChild(dropdown);
-  }
-
-  function renderPl() {
-    const pricePerWin = WIN_PRICE[plTier] || 1;
-    // 70% guaranteed winrate, duo has no guarantee (show "est.")
-    const wins = plMethod === "pilot" ? plGames * 0.7 : plGames * 0.7;
-    let total = pricePerWin * wins;
-    if (plMethod === "duo") total *= 1.70;
-    if ($("plStream").checked) total *= 1.05;
-    if ($("plPs").checked) total *= 1.50;
-    const role = ROLES.find(r => r.value === plRole);
-    if (role) total *= plMethod === "duo" ? role.duo : role.solo;
-
-    const out = $("plOutput");
-    out.textContent = "$" + total.toFixed(2);
-    out.className = "price-val";
-
-    // Show wins info in badge
-    const badge = $("plBadge");
-    if (plMethod === "pilot") {
-      badge.textContent = `~${Math.round(plGames * 0.7)} wins guaranteed`;
-      badge.classList.add("active");
-    } else {
-      badge.textContent = `~${Math.round(plGames * 0.7)} wins expected`;
-      badge.classList.add("active");
-    }
-    $("plOriginal").textContent = "";
-  }
-
-  function setMethod(m) {
-    plMethod = m;
-    $("methodPilot").classList.toggle("active", m === "pilot");
-    $("methodDuo").classList.toggle("active", m === "duo");
-    // Rebuild role select to update % labels
-    $("csPlRole").innerHTML = "";
-    buildPlRoleSelect();
-    renderPl();
-  }
-
-  // Win buttons
-  // Single range slider for placements games (1-10)
-  (function() {
-    const track = $("plGamesTrack"), fill = $("plGamesFill"), thumb = $("plGamesThumb");
-    let dragging = false;
-    function update(v, silent) {
-      plGames = Math.max(1, Math.min(10, Math.round(v)));
-      const pct = (plGames - 1) / 9 * 100;
-      fill.style.width = pct + "%";
-      thumb.style.left = pct + "%";
-      $("plGamesVal").textContent = plGames + (plGames === 1 ? " game" : " games");
-      if (!silent) renderPl();
-    }
-    function fromCX(cx) {
-      const r = track.getBoundingClientRect();
-      return 1 + ((cx - r.left) / r.width) * 9;
-    }
-    track.addEventListener("click", e => update(fromCX(e.clientX)));
-    thumb.addEventListener("mousedown", e => { dragging = true; thumb.classList.add("dragging"); e.preventDefault(); });
-    document.addEventListener("mousemove", e => { if (dragging) update(fromCX(e.clientX)); });
-    document.addEventListener("mouseup", () => { if (dragging) { dragging = false; thumb.classList.remove("dragging"); } });
-    thumb.addEventListener("touchstart", e => { dragging = true; thumb.classList.add("dragging"); e.preventDefault(); }, {passive:false});
-    document.addEventListener("touchmove", e => { if (dragging) update(fromCX(e.touches[0].clientX)); }, {passive:true});
-    document.addEventListener("touchend", () => { if (dragging) { dragging = false; thumb.classList.remove("dragging"); } });
-    update(5, true);
-  })();
-
-  // Mode switcher
-  function switchMode(mode) {
-    const isRank = mode === "rank";
-    $("rankPanel").classList.toggle("active", isRank);
-    $("placementPanel").classList.toggle("active", !isRank);
-    $("modeRank").classList.toggle("active", isRank);
-    $("modePl").classList.toggle("active", !isRank);
-    $("bannerMode").textContent = isRank ? "Rank Boost" : "Placements";
-  }
-
-  // Placement copy order
-  $("plCopyBtn").addEventListener("click", () => {
-    const price = $("plOutput").textContent;
+  if (mode === 'placement') {
     const role = ROLES.find(r => r.value === plRole);
     const opts = [];
-    if ($("plOffline").checked) opts.push("Offline Mode");
-    if ($("plVpn").checked) opts.push("VPN");
-    const text = [
-      "🎯 Overwatch Placement Boost",
-      "─────────────────────",
-      `Last Season: ${TIER_META[plTier].label}`,
-      `Games: ${plGames} (~${Math.round(plGames * 0.7)} wins)`,
-      `Method: ${plMethod === "pilot" ? "Piloted (7 wins guaranteed)" : "Duo (no guarantee)"}`,
+    if ($('plOffline').checked) opts.push('Offline Mode');
+    if ($('plVpn').checked) opts.push('VPN');
+    return ['🎯 Overwatch Placement Boost', line,
+      `Last Season: ${TIER_META[plTier] ? TIER_META[plTier].label : 'Unranked'}`,
+      `Games: ${plGames} (~${Math.round(plGames*.7)} wins)`,
+      `Method: ${plMethod === 'pilot' ? 'Piloted (7 wins guaranteed)' : 'Duo (no guarantee)'}`,
       `Role: ${role.label}`,
-      opts.length ? `Options: ${opts.join(", ")}` : null,
-      "─────────────────────",
-      `Total: ${price}`,
-    ].filter(Boolean).join("\n");
-    const btn = $("plCopyBtn");
-    const IC = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
-    const CK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-    function showCopied() { btn.classList.add("copied"); btn.innerHTML = CK + " Copied!"; setTimeout(() => { btn.classList.remove("copied"); btn.innerHTML = IC + " Copy"; }, 2000); }
-    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopy(text, showCopied)); }
-    else fallbackCopy(text, showCopied);
-  });
-
-  buildPlTierSelect();
-  buildPlRoleSelect();
-  ["plStream","plPs","plOffline","plVpn"].forEach(id => {
-    const el = $(id); if(el) el.addEventListener("change", renderPl);
-  });
-  renderPl();
-
-  // ── BATTLE PASS ──────────────────────────────────────────────────────────
-  // Geometric curve: level 1 = $0.20, level 200 = $2.00
-  // price(n) = 0.20 * r^(n-1), r = (2.0/0.2)^(1/199)
-  const BP_R = Math.pow(1.5/0.20, 1/199);
-  const BP_BASE = 0.20;
-
-  function bpLevelPrice(n) {
-    return BP_BASE * Math.pow(BP_R, n - 1);
+      opts.length ? `Options: ${opts.join(', ')}` : null,
+      line, `Total: ${$('plOutput').textContent}`
+    ].filter(Boolean).join('\n');
   }
-  function bpRangePrice(from, to) {
-    // sum of levels from..to-1 (cost to go from level `from` to `to`)
-    let total = 0;
-    for (let i = from; i < to; i++) total += bpLevelPrice(i);
-    return total;
-  }
-
-  let bpRole = "any";
-  let bpPreferredRole = "tank";
-
-  function setBpRole(r) {
-    bpRole = r;
-    $("bpRoleAny").classList.toggle("active", r === "any");
-    $("bpRoleLock").classList.toggle("active", r === "lock");
-    $("bpRoleLockField").style.display = r === "lock" ? "block" : "none";
-    renderBp();
-  }
-
-  function buildBpRoleSelect() {
-    const container = $("csBpRole");
-    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
-    const trigger = document.createElement("div"); trigger.className = "cs-trigger";
-    const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
-    const roleLabels = {tank:"Tank", dd:"DD", support:"Support"};
-    function refreshT() { trigger.innerHTML = `<span class="cs-label">${roleLabels[bpPreferredRole]}</span>${ARROW}`; }
-    Object.entries(roleLabels).forEach(([val, label]) => {
-      const opt = document.createElement("div");
-      opt.className = "cs-option" + (val === bpPreferredRole ? " selected" : "");
-      opt.textContent = label;
-      opt.addEventListener("click", () => {
-        bpPreferredRole = val;
-        dropdown.querySelectorAll(".cs-option").forEach(o => o.classList.toggle("selected", o.textContent === label));
-        container.classList.remove("open"); refreshT(); renderBp();
-      });
-      dropdown.appendChild(opt);
-    });
-    trigger.addEventListener("click", e => {
-      e.stopPropagation();
-      const was = container.classList.contains("open");
-      document.querySelectorAll(".custom-select.open").forEach(el => el.classList.remove("open"));
-      if (!was) container.classList.add("open");
-    });
-    refreshT(); container.appendChild(trigger); container.appendChild(dropdown);
-  }
-
-  function bpDiscount(levels) {
-    if (levels >= 150) return 0.20;
-    if (levels >= 100) return 0.15;
-    if (levels >= 50)  return 0.10;
-    if (levels >= 25)  return 0.05;
-    return 0;
-  }
-
-  function bpRangePriceDiscounted(from, to) {
-    const levels = to - from;
-    const disc = bpDiscount(levels);
-    let total = 0;
-    for (let i = from; i < to; i++) total += bpLevelPrice(i);
-    return total * (1 - disc);
-  }
-
-  function renderBp() {
-    const from = Math.max(1, Math.min(199, parseInt($("bpFrom").value) || 1));
-    const to   = Math.max(from + 1, Math.min(200, parseInt($("bpTo").value) || 200));
-    const base = bpRangePrice(from, to);
-    let total  = bpRangePriceDiscounted(from, to);
-    if (bpRole === "lock") total *= 1.10;
-    if ($("bpStream").checked) total *= 1.05;
-    if ($("bpPs").checked) total *= 1.50;
-    const out = $("bpOutput");
-    out.textContent = "$" + total.toFixed(2);
-    out.className = "price-val";
-    const levels = to - from;
-    const disc = bpDiscount(levels);
-    const badge = $("bpBadge");
-    badge.classList.add("active");
-    if (disc > 0) {
-      const noDiscBase = bpRangePrice(from, to);
-      let noDiscTotal = noDiscBase;
-      if (bpRole === "lock") noDiscTotal *= 1.10;
-      if ($("bpStream").checked) noDiscTotal *= 1.05;
-      if ($("bpPs").checked) noDiscTotal *= 1.50;
-      $("bpOriginal").textContent = "$" + noDiscTotal.toFixed(2);
-      badge.textContent = `${disc*100}% off · ${levels} levels`;
-    } else {
-      $("bpOriginal").textContent = "";
-      badge.textContent = `${levels} levels`;
-    }
-  }
-
-  // BP dual range slider (1-200) — push behavior like Rank Map
-  (function() {
-    const track = $("bpTrack"), fill = $("bpFill");
-    const thumbF = $("bpThumbFrom"), thumbT = $("bpThumbTo");
-    let dragF = false, dragT = false;
-    let bpFromV = 1, bpToV = 100;
-    function paint() {
-      const fp = (bpFromV - 1) / 199 * 100, tp = (bpToV - 1) / 199 * 100;
-      fill.style.left = fp + "%"; fill.style.width = (tp - fp) + "%";
-      fill.style.background = "var(--hero)";
-      thumbF.style.left = fp + "%"; thumbT.style.left = tp + "%";
-      $("bpFrom").value = bpFromV; $("bpTo").value = bpToV;
-      $("bpRangeVal").textContent = bpFromV + " → " + bpToV;
-      renderBp();
-    }
-    function fromCX(cx) {
-      const r = track.getBoundingClientRect();
-      return Math.round(1 + ((cx - r.left) / r.width) * 199);
-    }
-    function moveFrom(raw) {
-      const nf = Math.max(1, Math.min(199, raw));
-      if (nf >= bpToV) bpToV = Math.min(200, nf + 1);
-      bpFromV = nf; paint();
-    }
-    function moveTo(raw) {
-      const nt = Math.max(2, Math.min(200, raw));
-      if (nt <= bpFromV) bpFromV = Math.max(1, nt - 1);
-      bpToV = nt; paint();
-    }
-    thumbF.addEventListener("mousedown", e => { dragF = true; thumbF.classList.add("dragging"); e.preventDefault(); });
-    thumbT.addEventListener("mousedown", e => { dragT = true; thumbT.classList.add("dragging"); e.preventDefault(); });
-    document.addEventListener("mousemove", e => {
-      if (dragF) moveFrom(fromCX(e.clientX));
-      if (dragT) moveTo(fromCX(e.clientX));
-    });
-    document.addEventListener("mouseup", () => {
-      if (dragF) { dragF = false; thumbF.classList.remove("dragging"); }
-      if (dragT) { dragT = false; thumbT.classList.remove("dragging"); }
-    });
-    thumbF.addEventListener("touchstart", e => { dragF = true; thumbF.classList.add("dragging"); e.preventDefault(); }, {passive:false});
-    thumbT.addEventListener("touchstart", e => { dragT = true; thumbT.classList.add("dragging"); e.preventDefault(); }, {passive:false});
-    document.addEventListener("touchmove", e => {
-      const cx = e.touches[0].clientX;
-      if (dragF) moveFrom(fromCX(cx));
-      if (dragT) moveTo(fromCX(cx));
-    }, {passive:true});
-    document.addEventListener("touchend", () => {
-      dragF = false; dragT = false;
-      thumbF.classList.remove("dragging"); thumbT.classList.remove("dragging");
-    });
-    $("bpFrom").addEventListener("input", () => { moveFrom(parseInt($("bpFrom").value)||1); });
-    $("bpTo").addEventListener("input", () => { moveTo(parseInt($("bpTo").value)||200); });
-
-    // Drag segment (middle area) to move whole range
-    let dragSeg = false, segStartX = 0, segStartFrom = 1, segStartTo = 100;
-    track.addEventListener("mousedown", e => {
-      const fp = (bpFromV - 1) / 199, tp = (bpToV - 1) / 199;
-      const r = track.getBoundingClientRect();
-      const pos = (e.clientX - r.left) / r.width;
-      if (pos > fp + 0.02 && pos < tp - 0.02) {
-        dragSeg = true; segStartX = e.clientX;
-        segStartFrom = bpFromV; segStartTo = bpToV;
-        e.preventDefault();
-      }
-    });
-    document.addEventListener("mousemove", e => {
-      if (!dragSeg) return;
-      const r = track.getBoundingClientRect();
-      const delta = Math.round(((e.clientX - segStartX) / r.width) * 199);
-      let nf = segStartFrom + delta, nt = segStartTo + delta;
-      if (nf < 1) { nt += 1 - nf; nf = 1; }
-      if (nt > 200) { nf -= nt - 200; nt = 200; }
-      bpFromV = Math.max(1, nf); bpToV = Math.min(200, nt); paint();
-    });
-    document.addEventListener("mouseup", () => { dragSeg = false; });
-    track.addEventListener("touchstart", e => {
-      const fp = (bpFromV - 1) / 199, tp = (bpToV - 1) / 199;
-      const r = track.getBoundingClientRect();
-      const pos = (e.touches[0].clientX - r.left) / r.width;
-      if (pos > fp + 0.02 && pos < tp - 0.02) {
-        dragSeg = true; segStartX = e.touches[0].clientX;
-        segStartFrom = bpFromV; segStartTo = bpToV; e.preventDefault();
-      }
-    }, {passive:false});
-    document.addEventListener("touchmove", e => {
-      if (!dragSeg) return;
-      const r = track.getBoundingClientRect();
-      const delta = Math.round(((e.touches[0].clientX - segStartX) / r.width) * 199);
-      let nf = segStartFrom + delta, nt = segStartTo + delta;
-      if (nf < 1) { nt += 1 - nf; nf = 1; }
-      if (nt > 200) { nf -= nt - 200; nt = 200; }
-      bpFromV = Math.max(1, nf); bpToV = Math.min(200, nt); paint();
-    }, {passive:true});
-    document.addEventListener("touchend", () => { dragSeg = false; });
-
-    paint();
-  })();
-  ["bpStream","bpPs","bpOffline","bpVpn"].forEach(id => { const el=$(id); if(el) el.addEventListener("change", renderBp); });
-
-  $("bpCopyBtn").addEventListener("click", () => {
-    const price = $("bpOutput").textContent;
-    const from = $("bpFrom").value, to = $("bpTo").value;
+  if (mode === 'battlepass') {
+    const from = $('bpFrom').value, to = $('bpTo').value;
     const opts = [];
-    if (bpRole === "lock") opts.push(`Role Lock: ${bpPreferredRole}`);
-    if ($("bpStream").checked) opts.push("Stream");
-    if ($("bpPs").checked) opts.push("PlayStation +50%");
-    if ($("bpOffline").checked) opts.push("Offline Mode");
-    if ($("bpVpn").checked) opts.push("VPN");
-    const text = ["⚡ Overwatch Battle Pass Boost","─────────────────────",
+    if (bpRole === 'lock') opts.push(`Role Lock: ${bpPreferredRole}`);
+    if ($('bpStream').checked) opts.push('Stream');
+    if ($('bpPs').checked) opts.push('PlayStation +50%');
+    if ($('bpOffline').checked) opts.push('Offline Mode');
+    if ($('bpVpn').checked) opts.push('VPN');
+    return ['⚡ Overwatch Battle Pass Boost', line,
       `Levels: ${from} → ${to} (${to - from} levels)`,
-      opts.length ? `Options: ${opts.join(", ")}` : null,
-      "─────────────────────", `Total: ${price}`
-    ].filter(Boolean).join("\n");
-    const btn = $("bpCopyBtn");
-    const CK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-    const IC = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
-    function showCopied(){btn.classList.add("copied");btn.innerHTML=CK+" Copied!";setTimeout(()=>{btn.classList.remove("copied");btn.innerHTML=IC+" Copy";},2000);}
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(showCopied).catch(()=>fallbackCopy(text,showCopied));}
-    else fallbackCopy(text,showCopied);
-  });
-
-  buildBpRoleSelect();
-  renderBp();
-
-  // ── COMPETITIVE DRIVES ────────────────────────────────────────────────────
-  const DRIVE_PRICE = {
-    bronze: 10, silver: 15, gold: 20, platinum: 25,
-    diamond: 30, master: 60, grandmaster: 200
-  };
-
-  let drTier = "gold";
-  let drRoleVal = "tank";
-
-  function buildDrTierSelect() {
-    const container = $("csDrTier");
-    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
-    const trigger = document.createElement("div"); trigger.className = "cs-trigger";
-    const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
-    function getLabel(tier) {
-      const m = TIER_META[tier];
-      return `<span class="rank-icon" style="width:20px;height:20px;background:${m.bg};color:${m.color};font-size:9px">${m.symbol}</span> <span class="cs-label">${m.label} — $${DRIVE_PRICE[tier]}</span>`;
-    }
-    trigger.innerHTML = getLabel(drTier) + ARROW;
-    TIERS.forEach(tier => {
-      const opt = document.createElement("div");
-      opt.className = "cs-option" + (tier === drTier ? " selected" : "");
-      opt.dataset.tier = tier;
-      const m = TIER_META[tier];
-      opt.innerHTML = `<span class="rank-icon" style="width:18px;height:18px;background:${m.bg};color:${m.color};font-size:8px">${m.symbol}</span> ${m.label} — $${DRIVE_PRICE[tier]}`;
-      opt.addEventListener("click", () => {
-        drTier = tier;
-        trigger.innerHTML = getLabel(drTier) + ARROW;
-        dropdown.querySelectorAll(".cs-option").forEach(o => o.classList.toggle("selected", o.dataset.tier === tier));
-        container.classList.remove("open");
-        renderDr();
-      });
-      dropdown.appendChild(opt);
-    });
-    trigger.addEventListener("click", e => {
-      e.stopPropagation();
-      const was = container.classList.contains("open");
-      document.querySelectorAll(".custom-select.open").forEach(el => el.classList.remove("open"));
-      if (!was) container.classList.add("open");
-    });
-    container.appendChild(trigger); container.appendChild(dropdown);
+      opts.length ? `Options: ${opts.join(', ')}` : null,
+      line, `Total: ${$('bpOutput').textContent}`
+    ].filter(Boolean).join('\n');
   }
-
-  function renderDr() {
-    const from = Math.max(0, Math.min(3999, parseInt($("drFrom").value) || 0));
-    const to   = Math.max(from + 1, Math.min(4000, parseInt($("drTo").value) || 4000));
-    const range = to - from;
-    const pricePerPoint = DRIVE_PRICE[drTier] / 4000;
-    let total = pricePerPoint * range;
-    const drDuo = $("drDuo").checked;
-    if (drDuo)                 total *= 1.50;
-    if ($("drStream").checked) total *= 1.05;
-    if ($("drPs").checked)     total *= 1.50;
-    // Role multipliers: solo uses solo rates, duo uses duo rates; "any" = no multiplier
-    if (drRoleVal !== "any") {
-      const drRole = ROLES.find(r => r.value === drRoleVal);
-      if (drRole) total *= drDuo ? drRole.duo : drRole.solo;
-    }
-    $("drRangeLabel").textContent = `${range} points (${Math.round(range/4000*100)}% of full drive)`;
-    const out = $("drOutput");
-    out.textContent = "$" + total.toFixed(2);
-    out.className = "price-val";
-    $("drBadge").textContent = `$${(pricePerPoint).toFixed(3)}/pt`;
-    $("drBadge").classList.add("active");
-    $("drOriginal").textContent = "";
-  }
-
-  // Drives dual range slider (0-4000) — push behavior like Rank Map
-  (function() {
-    const track = $("drTrack"), fill = $("drFill");
-    const thumbF = $("drThumbFrom"), thumbT = $("drThumbTo");
-    let dragF = false, dragT = false;
-    let drFromV = 0, drToV = 4000;
-    function paint() {
-      const fp = drFromV / 4000 * 100, tp = drToV / 4000 * 100;
-      fill.style.left = fp + "%"; fill.style.width = (tp - fp) + "%";
-      fill.style.background = "var(--hero)";
-      thumbF.style.left = fp + "%"; thumbT.style.left = tp + "%";
-      $("drFrom").value = drFromV; $("drTo").value = drToV;
-      $("drRangeVal").textContent = (drToV - drFromV) + " pts";
-      renderDr();
-    }
-    function fromCX(cx) {
-      const r = track.getBoundingClientRect();
-      return Math.round(Math.max(0, Math.min(4000, ((cx - r.left) / r.width) * 4000)));
-    }
-    function moveFrom(raw) {
-      const nf = Math.max(0, Math.min(3999, raw));
-      if (nf >= drToV) drToV = Math.min(4000, nf + 1);
-      drFromV = nf; paint();
-    }
-    function moveTo(raw) {
-      const nt = Math.max(1, Math.min(4000, raw));
-      if (nt <= drFromV) drFromV = Math.max(0, nt - 1);
-      drToV = nt; paint();
-    }
-    thumbF.addEventListener("mousedown", e => { dragF = true; thumbF.classList.add("dragging"); e.preventDefault(); });
-    thumbT.addEventListener("mousedown", e => { dragT = true; thumbT.classList.add("dragging"); e.preventDefault(); });
-    document.addEventListener("mousemove", e => {
-      if (dragF) moveFrom(fromCX(e.clientX));
-      if (dragT) moveTo(fromCX(e.clientX));
-    });
-    document.addEventListener("mouseup", () => {
-      if (dragF) { dragF = false; thumbF.classList.remove("dragging"); }
-      if (dragT) { dragT = false; thumbT.classList.remove("dragging"); }
-    });
-    thumbF.addEventListener("touchstart", e => { dragF = true; thumbF.classList.add("dragging"); e.preventDefault(); }, {passive:false});
-    thumbT.addEventListener("touchstart", e => { dragT = true; thumbT.classList.add("dragging"); e.preventDefault(); }, {passive:false});
-    document.addEventListener("touchmove", e => {
-      const cx = e.touches[0].clientX;
-      if (dragF) moveFrom(fromCX(cx));
-      if (dragT) moveTo(fromCX(cx));
-    }, {passive:true});
-    document.addEventListener("touchend", () => {
-      dragF = false; dragT = false;
-      thumbF.classList.remove("dragging"); thumbT.classList.remove("dragging");
-    });
-    $("drFrom").addEventListener("input", () => { moveFrom(parseInt($("drFrom").value)||0); });
-    $("drTo").addEventListener("input", () => { moveTo(parseInt($("drTo").value)||4000); });
-
-    // Drag segment to move whole range
-    let dragSeg = false, segStartX = 0, segStartFrom = 0, segStartTo = 4000;
-    track.addEventListener("mousedown", e => {
-      const fp = drFromV / 4000, tp = drToV / 4000;
-      const r = track.getBoundingClientRect();
-      const pos = (e.clientX - r.left) / r.width;
-      if (pos > fp + 0.02 && pos < tp - 0.02) {
-        dragSeg = true; segStartX = e.clientX;
-        segStartFrom = drFromV; segStartTo = drToV; e.preventDefault();
-      }
-    });
-    document.addEventListener("mousemove", e => {
-      if (!dragSeg) return;
-      const r = track.getBoundingClientRect();
-      const delta = Math.round(((e.clientX - segStartX) / r.width) * 4000);
-      let nf = segStartFrom + delta, nt = segStartTo + delta;
-      if (nf < 0) { nt -= nf; nf = 0; }
-      if (nt > 4000) { nf -= nt - 4000; nt = 4000; }
-      drFromV = Math.max(0, nf); drToV = Math.min(4000, nt); paint();
-    });
-    document.addEventListener("mouseup", () => { dragSeg = false; });
-    track.addEventListener("touchstart", e => {
-      const fp = drFromV / 4000, tp = drToV / 4000;
-      const r = track.getBoundingClientRect();
-      const pos = (e.touches[0].clientX - r.left) / r.width;
-      if (pos > fp + 0.02 && pos < tp - 0.02) {
-        dragSeg = true; segStartX = e.touches[0].clientX;
-        segStartFrom = drFromV; segStartTo = drToV; e.preventDefault();
-      }
-    }, {passive:false});
-    document.addEventListener("touchmove", e => {
-      if (!dragSeg) return;
-      const r = track.getBoundingClientRect();
-      const delta = Math.round(((e.touches[0].clientX - segStartX) / r.width) * 4000);
-      let nf = segStartFrom + delta, nt = segStartTo + delta;
-      if (nf < 0) { nt -= nf; nf = 0; }
-      if (nt > 4000) { nf -= nt - 4000; nt = 4000; }
-      drFromV = Math.max(0, nf); drToV = Math.min(4000, nt); paint();
-    }, {passive:true});
-    document.addEventListener("touchend", () => { dragSeg = false; });
-
-    paint();
-  })();
-  ["drPs","drVpn"].forEach(id => { const el=$(id); if(el) el.addEventListener("change", renderDr); });
-
-  $("drCopyBtn").addEventListener("click", () => {
-    const price = $("drOutput").textContent;
-    const from = $("drFrom").value, to = $("drTo").value;
+  if (mode === 'drives') {
+    const from = $('drFrom').value, to = $('drTo').value;
     const opts = [];
-    const drRoleCopy = ROLES.find(r => r.value === drRoleVal);
-    if ($("drDuo").checked) opts.push("Duo +50%");
-    if ($("drStream").checked) opts.push("Stream");
-    if ($("drPs").checked) opts.push("PlayStation +50%");
-    if ($("drVpn").checked) opts.push("VPN");
-    if (drRoleCopy && drRoleCopy.solo !== 1) opts.push(`Role: ${drRoleCopy.label}`);
-    const text = ["🔥 Overwatch Competitive Drives","─────────────────────",
+    const drRole = ROLES.find(r => r.value === drRoleVal);
+    if ($('drDuo').checked) opts.push('Duo +50%');
+    if ($('drStream').checked) opts.push('Stream');
+    if ($('drPs').checked) opts.push('PlayStation +50%');
+    if ($('drVpn').checked) opts.push('VPN');
+    if (drRole && drRole.solo !== 1) opts.push(`Role: ${drRole.label}`);
+    return ['🔥 Overwatch Competitive Drives', line,
       `Rank: ${TIER_META[drTier].label}`,
       `Points: ${from} → ${to} (${to - from} pts)`,
-      opts.length ? `Options: ${opts.join(", ")}` : null,
-      "─────────────────────", `Total: ${price}`
-    ].filter(Boolean).join("\n");
-    const btn = $("drCopyBtn");
-    const CK = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-    const IC = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 4V2.5A1.5 1.5 0 015.5 1h6A1.5 1.5 0 0113 2.5v6A1.5 1.5 0 0111.5 10H10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
-    function showCopied(){btn.classList.add("copied");btn.innerHTML=CK+" Copied!";setTimeout(()=>{btn.classList.remove("copied");btn.innerHTML=IC+" Copy";},2000);}
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(showCopied).catch(()=>fallbackCopy(text,showCopied));}
-    else fallbackCopy(text,showCopied);
-  });
-
-  function buildDrRoleSelect() {
-    const container = $("csDrRole");
-    const ARROW = `<svg class="cs-arrow" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
-    const trigger = document.createElement("div"); trigger.className = "cs-trigger";
-    const dropdown = document.createElement("div"); dropdown.className = "cs-dropdown";
-    function sfx(rv) {
-      const role = ROLES.find(r => r.value === rv);
-      const isDrDuo = $("drDuo") && $("drDuo").checked;
-      const m = isDrDuo ? role.duo : role.solo;
-      return m !== 1 ? ` <span style="color:#6c8fff;font-size:10px">+${Math.round((m-1)*100)}%</span>` : "";
-    }
-    function refresh() {
-      dropdown.innerHTML = "";
-      const h1 = document.createElement("div"); h1.className = "cs-group-header";
-      h1.innerHTML = `<span style="color:var(--dim)">Role Queue</span>`; dropdown.appendChild(h1);
-      ["tank","dd","support"].forEach(rv => {
-        const role = ROLES.find(r => r.value === rv);
-        const opt = document.createElement("div");
-        opt.className = "cs-option" + (drRoleVal === rv ? " selected" : "");
-        opt.innerHTML = role.label + sfx(rv);
-        opt.addEventListener("click", () => { drRoleVal = rv; container.classList.remove("open"); refreshT(); refresh(); renderDr(); });
-        dropdown.appendChild(opt);
-      });
-      const div = document.createElement("div"); div.className = "cs-divider"; dropdown.appendChild(div);
-      ["openq","any"].forEach((rv, i) => {
-        const label = rv === "openq" ? "6v6" : "Any Role";
-        const opt = document.createElement("div");
-        opt.className = "cs-option" + (drRoleVal === rv ? " selected" : "");
-        opt.textContent = label;
-        opt.addEventListener("click", () => { drRoleVal = rv; container.classList.remove("open"); refreshT(); refresh(); renderDr(); });
-        dropdown.appendChild(opt);
-      });
-    }
-    function refreshT() {
-      const role = ROLES.find(r => r.value === drRoleVal);
-      const label = drRoleVal === "any" ? "Any Role" : (role ? role.label : drRoleVal);
-      trigger.innerHTML = `<span class="cs-label">${label}${drRoleVal !== "any" && role ? sfx(drRoleVal) : ""}</span>${ARROW}`;
-    }
-    trigger.addEventListener("click", e => {
-      e.stopPropagation();
-      const was = container.classList.contains("open");
-      document.querySelectorAll(".custom-select.open").forEach(el => el.classList.remove("open"));
-      if (!was) container.classList.add("open");
-    });
-    refreshT(); refresh();
-    container.appendChild(trigger); container.appendChild(dropdown);
+      opts.length ? `Options: ${opts.join(', ')}` : null,
+      line, `Total: ${$('drOutput').textContent}`
+    ].filter(Boolean).join('\n');
   }
+  return null;
+}
 
-  buildDrTierSelect();
-  buildDrRoleSelect();
-  ["drStream","drPs","drVpn"].forEach(id => { const el=$(id); if(el) el.addEventListener("change", renderDr); });
-  const drDuoEl = $("drDuo");
-  if (drDuoEl) drDuoEl.addEventListener("change", () => {
-    // Rebuild role select to update % labels
-    $("csDrRole").innerHTML = "";
-    buildDrRoleSelect();
-    renderDr();
-  });
-  renderDr();
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+// Rank selects
+const csFromCtrl = buildRankSelect('csFrom', fromIdx, idx => {
+  fromIdx = idx; if (toIdx <= fromIdx) toIdx = Math.min(fromIdx+1, TOTAL-1);
+  render();
+  const t = $('csFrom').querySelector('.cs-trigger');
+  if (t) { t.classList.remove('pulse'); void t.offsetWidth; t.classList.add('pulse'); setTimeout(() => t.classList.remove('pulse'), 400); }
+});
+const csToCtrl = buildRankSelect('csTo', toIdx, idx => {
+  toIdx = idx; if (fromIdx >= toIdx) fromIdx = Math.max(toIdx-1, 0);
+  render();
+  const t = $('csTo').querySelector('.cs-trigger');
+  if (t) { t.classList.remove('pulse'); void t.offsetWidth; t.classList.add('pulse'); setTimeout(() => t.classList.remove('pulse'), 400); }
+});
 
-  // ── UPDATED switchMode ─────────────────────────────────────────────────────
-  function switchMode(mode) {
-    const panels = {rank:"rankPanel", placement:"placementPanel", battlepass:"bpPanel", drives:"drPanel"};
-    const btns   = {rank:"modeRank", placement:"modePl", battlepass:"modeBp", drives:"modeDr"};
-    const titles = {rank:"Rank Boost", placement:"Placements", battlepass:"Battle Pass", drives:"Drives"};
-    Object.values(panels).forEach(id => { const el=$(id); if(el) el.classList.remove("active"); });
-    Object.values(btns).forEach(id => { const el=$(id); if(el) el.classList.remove("active"); });
-    const panel=$(panels[mode]); if(panel) panel.classList.add("active");
-    const btn=$(btns[mode]); if(btn) btn.classList.add("active");
-    $("bannerMode").textContent = titles[mode] || "Boost";
+// Role selects
+const rankRoleCtrl = buildRoleSelect('csRole', {isDuoFn: () => $('duoBoost').checked, onChange: rv => { roleVal = rv; render(); }});
+let plRoleCtrl = buildRoleSelect('csPlRole', {isDuoFn: () => plMethod === 'duo', onChange: rv => { plRole = rv; renderPl(); }});
+const drRoleCtrl = buildRoleSelect('csDrRole', {isDuoFn: () => $('drDuo').checked, extraValues: [{value:'any',label:'Any Role'}], onChange: rv => { drRoleVal = rv; renderDr(); }});
+
+// Pct sliders
+const sliderFrom = buildPctSlider('pctFromTrack','pctFromThumb','pctFromFill','pctFromVal',() => idxToPct(fromIdx), v => { pctFrom = v; render(); });
+const sliderTo   = buildPctSlider('pctToTrack','pctToThumb','pctToFill','pctToVal',() => idxToPct(toIdx), v => { pctTo = v; render(); });
+
+// Tier selects
+buildTierSelect('csPlTier', PL_TIERS, PL_TIER_META, null, tier => { plTier = tier; renderPl(); });
+buildTierSelect('csDrTier', TIERS, TIER_META, tier => `$${DRIVE_PRICE[tier]}`, tier => { drTier = tier; renderDr(); });
+
+// Progress bar
+buildTierTicks(); buildProgressLabels(); buildProgressDrag();
+
+// Pct slider for placements games
+(function() {
+  const track = $('plGamesTrack'), fill = $('plGamesFill'), thumb = $('plGamesThumb');
+  function update(v, silent) {
+    plGames = Math.max(1, Math.min(10, Math.round(v)));
+    const pct = (plGames - 1) / 9 * 100;
+    fill.style.width = pct + '%'; thumb.style.left = pct + '%';
+    $('plGamesVal').textContent = plGames + (plGames === 1 ? ' game' : ' games');
+    if (!silent) renderPl();
   }
+  function fromCX(cx) { const r = track.getBoundingClientRect(); return 1 + ((cx - r.left) / r.width) * 9; }
+  track.addEventListener('click', e => update(fromCX(e.clientX)));
+  makeDraggable1D(thumb, x => update(fromCX(x)), x => x);
+  update(5, true);
+})();
 
+// BP dual range
+const bpSlider = makeDualRangeSlider({
+  trackId:'bpTrack', fillId:'bpFill', thumbFromId:'bpThumbFrom', thumbToId:'bpThumbTo',
+  min:1, max:200, initFrom:1, initTo:100,
+  onPaint(f, t) { $('bpFrom').value = f; $('bpTo').value = t; $('bpRangeVal').textContent = f + ' → ' + t; renderBp(); }
+});
+$('bpFrom').addEventListener('input', () => bpSlider.moveFrom(parseInt($('bpFrom').value)||1));
+$('bpTo').addEventListener('input', () => bpSlider.moveTo(parseInt($('bpTo').value)||200));
+
+// Drives dual range
+const drSlider = makeDualRangeSlider({
+  trackId:'drTrack', fillId:'drFill', thumbFromId:'drThumbFrom', thumbToId:'drThumbTo',
+  min:0, max:4000, initFrom:0, initTo:4000,
+  onPaint(f, t) { $('drFrom').value = f; $('drTo').value = t; $('drRangeVal').textContent = (t-f) + ' pts'; renderDr(); }
+});
+$('drFrom').addEventListener('input', () => drSlider.moveFrom(parseInt($('drFrom').value)||0));
+$('drTo').addEventListener('input', () => drSlider.moveTo(parseInt($('drTo').value)||4000));
+
+// Toggle listeners
+['duoBoost','stream','offline','vpn','rankPs'].forEach(id => { const el = $(id); if (el) el.addEventListener('change', () => { if (id === 'duoBoost') { rankRoleCtrl.refreshAll(); } render(); }); });
+['plStream','plPs','plOffline','plVpn'].forEach(id => { const el = $(id); if (el) el.addEventListener('change', renderPl); });
+['bpStream','bpPs','bpOffline','bpVpn'].forEach(id => { const el = $(id); if (el) el.addEventListener('change', renderBp); });
+['drStream','drPs','drVpn'].forEach(id => { const el = $(id); if (el) el.addEventListener('change', renderDr); });
+$('drDuo').addEventListener('change', () => { $('csDrRole').innerHTML = ''; buildRoleSelect('csDrRole', {isDuoFn: () => $('drDuo').checked, extraValues: [{value:'any',label:'Any Role'}], onChange: rv => { drRoleVal = rv; renderDr(); }}); renderDr(); });
+
+// Copy buttons
+document.querySelectorAll('[data-copy]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const text = getCopyText(btn.dataset.copy);
+    if (text) copyText(text, btn);
+  });
+});
+
+// Close selects on outside click
+document.addEventListener('click', closeAllSelects);
+
+// BP role select
+buildBpRoleSelect();
+
+// Initial renders
+render(); renderPl(); renderBp(); renderDr();
 </script>
 </body>
 </html>
